@@ -90,6 +90,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                       },
                     ),
+                    SizedBox(
+                      height: 100.0,
+                    ),
+                    CustomButton(
+                        text: 'Register New Family',
+                        colour: kLightAccentColour,
+                        onPress: () {},
+                        radius: 32),
                   ],
                 ),
               ],

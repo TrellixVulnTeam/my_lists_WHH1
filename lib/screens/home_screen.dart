@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/new_list.dart';
 import 'package:my_lists/screens/login_screen.dart';
+import 'package:my_lists/screens/registration_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
@@ -44,7 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Register New User',
                   style: TextStyle(color: kPrimaryTextColour),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, RegistrationScreen.id);
+                },
               ),
               ListTile(
                 title: Text(

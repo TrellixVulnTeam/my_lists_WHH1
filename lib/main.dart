@@ -20,3 +20,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+//TODO: Create family registration page - access from login screen
+//TODO: First user in the family is admin
+//TODO: Change form depending on which page you're coming from, pass specific form through navigation??
