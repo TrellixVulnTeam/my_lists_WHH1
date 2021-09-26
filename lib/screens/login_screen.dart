@@ -4,7 +4,6 @@ import 'package:my_lists/screens/home_screen.dart';
 import 'package:my_lists/components/center_text.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/custom_button.dart';
-import 'package:my_lists/screens/family_registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -16,8 +15,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _auth = FirebaseAuth.instance;
 
-  late String email;
-  late String password;
+  String email = '';
+  String password = '';
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(height: 50.0),
                 Container(
                   child: Image.asset('assets/images/logo-100.png'),
                 ),
@@ -49,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 TextField(
                   textAlign: TextAlign.center,
-                  decoration: kLoginTextFieldDecoration.copyWith(
-                      hintText: 'Email Address'),
+                  decoration:
+                      kLoginTextFieldDecoration.copyWith(hintText: 'Username'),
                   onChanged: (value) {
                     email = value.trim();
                   },
@@ -92,17 +90,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                       },
                     ),
-                    SizedBox(
-                      height: 100.0,
-                    ),
-                    CustomButton(
-                        text: 'Register New Family',
-                        colour: kLightAccentColour,
-                        onPress: () {
-                          Navigator.pushNamed(
-                              context, FamilyRegistrationScreen.id);
-                        },
-                        radius: 32),
                   ],
                 ),
               ],

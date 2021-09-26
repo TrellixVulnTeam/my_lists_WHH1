@@ -13,15 +13,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My Lists',
+      title: 'Flutter Demo',
       theme: appTheme(),
       initialRoute: '/',
       routes: routes,
     );
   }
 }
-
-// TODO: bottom menu
-// TODO: amend lists or note after creation
-// TODO: work out security on DB????
-// TODO: refactor getUserDetails

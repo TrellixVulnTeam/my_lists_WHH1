@@ -13,7 +13,6 @@ const kPrimaryColour = Colors.white;
 const kAccentColour = Color(0xFF26a69a);
 const kLightAccentColour = Color(0xFF80cbc4);
 const kDarkAccentColour = Color(0xFF00897b);
-const kSuperLightAccentColour = Color(0xFFb2dfdb);
 
 const kPrimaryTextColour = Color(0xFF424242);
 const kSecondaryTextColour = Color(0xFFffffff);
