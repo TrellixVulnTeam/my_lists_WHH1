@@ -4,6 +4,7 @@ import 'package:my_lists/screens/home_screen.dart';
 import 'package:my_lists/components/center_text.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/custom_button.dart';
+import 'package:my_lists/screens/family_registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -15,8 +16,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _auth = FirebaseAuth.instance;
 
-  String email = '';
-  String password = '';
+  late String email;
+  late String password;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +97,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     CustomButton(
                         text: 'Register New Family',
                         colour: kLightAccentColour,
-                        onPress: () {},
+                        onPress: () {
+                          Navigator.pushNamed(
+                              context, FamilyRegistrationScreen.id);
+                        },
                         radius: 32),
                   ],
                 ),

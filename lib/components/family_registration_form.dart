@@ -9,64 +9,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 bool isSuccessful = false;
 final db = FirebaseFirestore.instance;
 
-class UserRegistrationForm extends StatefulWidget {
+class FamilyRegistrationForm extends StatefulWidget {
   @override
-  _UserRegistrationFormState createState() => _UserRegistrationFormState();
+  _FamilyRegistrationFormState createState() => _FamilyRegistrationFormState();
 }
 
-class _UserRegistrationFormState extends State<UserRegistrationForm> {
-  final _userRegistrationFormKey = GlobalKey<FormState>();
+class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
+  final _familyRegistrationFormKey = GlobalKey<FormState>();
   final _auth = FirebaseAuth.instance;
-  late User loggedInUser;
-  bool currentUserIsAdmin = false;
-  late String _currentUserFamily;
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  void initState() {
-    getCurrentUserFamily();
-    super.initState();
-  }
-
-  void getCurrentUserFamily() {
-    final currentUser = _auth.currentUser;
-    if (currentUser != null) {
-      loggedInUser = currentUser;
-
-      // Get the whole user doc and then process the snapshot to get to the fields
-      Future<String> getDetails() async {
-        DocumentReference userRef =
-            db.collection('users').doc(loggedInUser.uid);
-        String family = '';
-        await userRef.get().then((snapshot) {
-          if (snapshot.data() != null) {
-            family = snapshot['family'];
-            currentUserIsAdmin = snapshot['isAdmin'];
-          }
-        });
-        setState(() {
-          _currentUserFamily = family;
-        });
-        return family;
-      }
-
-      getDetails();
-    }
-  }
 
   late String _email;
   late String _password;
   late String _firstName;
   late String _lastName;
+  late String _familyName;
   bool _isAdmin = false;
 
   bool showSpinner = false;
 
   // define callable function
-  HttpsCallable createUserCallable = FirebaseFunctions.instance.httpsCallable(
+  HttpsCallable createFamilyCallable = FirebaseFunctions.instance.httpsCallable(
       'createUser',
       options: HttpsCallableOptions(timeout: Duration(seconds: 5)));
 
@@ -78,16 +40,16 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
       "firstName": _firstName,
       "lastName": _lastName,
       "isAdmin": _isAdmin,
-      "family": _currentUserFamily,
+      "family": _familyName,
     };
 
     String uid = "0";
-    await createUserCallable(data)
+    await createFamilyCallable(data)
         .then((response) => {
               if (response.data['status'] == 'success')
                 {
                   isSuccessful = true,
-                  showAlertDialog(context, 'User Created Successfully!'),
+                  showAlertDialog(context, 'Family Created Successfully!'),
                 }
               else
                 {
@@ -104,11 +66,26 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _userRegistrationFormKey,
+      key: _familyRegistrationFormKey,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
+            TextFormField(
+              textAlign: TextAlign.center,
+              decoration:
+                  kLoginTextFieldDecoration.copyWith(hintText: 'Family Name'),
+              onChanged: (value) {
+                _familyName = value.trim();
+              },
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter a name for your family.';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 15.0),
             TextFormField(
               textAlign: TextAlign.center,
               decoration:
@@ -179,7 +156,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                     setState(() {
                       showSpinner = true;
                     });
-                    if (_userRegistrationFormKey.currentState!.validate()) {
+                    if (_familyRegistrationFormKey.currentState!.validate()) {
                       createUser();
 
                       setState(() {
