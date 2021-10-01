@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,9 +6,17 @@ import 'package:my_lists/components/list_field.dart';
 
 final db = FirebaseFirestore.instance;
 
-List<Widget> listItems = [
-  ListField(onChange: (val) => print(val)),
+late User loggedInUser;
+late String title;
+late String item;
+
+List<Widget> listFields = [
+  ListField(
+    onChange: (value) => item = value,
+  ),
 ];
+
+List<String> listItems = [];
 
 class NewList extends StatefulWidget {
   static const String id = 'new_list';
@@ -17,9 +26,25 @@ class NewList extends StatefulWidget {
 }
 
 class _NewListState extends State<NewList> {
+  final _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    getCurrentUser();
+    super.initState();
+  }
+
+  void getCurrentUser() {
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      loggedInUser = currentUser;
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
+    listFields = [];
     listItems = [];
   }
 
@@ -39,19 +64,23 @@ class _NewListState extends State<NewList> {
                   style: TextStyle(fontSize: 20.0),
                   decoration: InputDecoration(
                       hintText: 'Title', border: InputBorder.none),
+                  onChanged: (value) {
+                    title = value.trim();
+                  },
                 ),
               ),
               ListField(
-                onChange: (val) => print(val),
+                onChange: (value) => item = value,
               ),
               ListView(
                 shrinkWrap: true,
-                children: listItems,
+                children: listFields,
               ),
               Row(
                 children: [
                   TextButton(
                     onPressed: () {
+                      _addItem();
                       _addLine();
                       setState(() {});
                     },
@@ -75,6 +104,7 @@ class _NewListState extends State<NewList> {
                       ),
                       onPressed: () {
                         Navigator.pop(context);
+                        listFields = [];
                         listItems = [];
                       },
                     ),
@@ -84,7 +114,11 @@ class _NewListState extends State<NewList> {
                         style: TextStyle(
                             color: kPrimaryTextColour, fontSize: 25.0),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        _addItem();
+                        createList(title);
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),
@@ -99,10 +133,39 @@ class _NewListState extends State<NewList> {
 
 void _addLine() {
   // .. notation is cascade operator, used to not repeat 'listItems'. This is equivalent to the next 2 lines commented out
-  listItems = List.from(listItems)
-    ..add(ListField(
-      onChange: (val) => print(val),
-    ));
+  listFields = List.from(listFields)
+    ..add(
+      ListField(
+        onChange: (value) => item = value,
+      ),
+    );
   // listItems = List.from(listItems);
   // listItems.add(ListField());
+}
+
+void _addItem() {
+  listItems = List.from(listItems);
+  listItems.add(item);
+}
+
+void createList(title) {
+  DocumentReference lists = db
+      .collection('users')
+      .doc(loggedInUser.uid)
+      .collection('lists')
+      .doc(title);
+
+  Future<void> creatingList() {
+    return lists
+        .set({
+          'title': title,
+          'body': listItems,
+          'created at': FieldValue.serverTimestamp(),
+          'created by': loggedInUser.email,
+        })
+        .then((value) => print("Report Added"))
+        .catchError((error) => print("Failed to add report: $error"));
+  }
+
+  creatingList();
 }

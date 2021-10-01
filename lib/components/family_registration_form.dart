@@ -19,7 +19,6 @@ class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
   late String _email;
   late String _password;
   late String _firstName;
-  //late String _lastName;
   late String _familyName;
   bool _isAdmin = false;
 

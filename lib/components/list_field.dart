@@ -3,7 +3,7 @@ import 'package:my_lists/constants.dart';
 
 class ListField extends StatelessWidget {
   // Used to grab content of TextField
-  final Function(String) onChange;
+  late final Function(String) onChange;
 
   ListField({required this.onChange});
 
