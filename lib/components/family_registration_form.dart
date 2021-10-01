@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/custom_button.dart';
 import 'package:my_lists/screens/home_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 bool isSuccessful = false;
 final db = FirebaseFirestore.instance;
@@ -16,19 +15,18 @@ class FamilyRegistrationForm extends StatefulWidget {
 
 class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
   final _familyRegistrationFormKey = GlobalKey<FormState>();
-  final _auth = FirebaseAuth.instance;
 
   late String _email;
   late String _password;
   late String _firstName;
-  late String _lastName;
+  //late String _lastName;
   late String _familyName;
   bool _isAdmin = false;
 
   bool showSpinner = false;
 
   // define callable function
-  HttpsCallable createFamilyCallable = FirebaseFunctions.instance.httpsCallable(
+  HttpsCallable createUserCallable = FirebaseFunctions.instance.httpsCallable(
       'createUser',
       options: HttpsCallableOptions(timeout: Duration(seconds: 5)));
 
@@ -38,13 +36,12 @@ class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
       "email": _email,
       "password": _password,
       "firstName": _firstName,
-      "lastName": _lastName,
       "isAdmin": _isAdmin,
       "family": _familyName,
     };
 
     String uid = "0";
-    await createFamilyCallable(data)
+    await createUserCallable(data)
         .then((response) => {
               if (response.data['status'] == 'success')
                 {
@@ -85,26 +82,12 @@ class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
                 return null;
               },
             ),
-            SizedBox(height: 15.0),
-            TextFormField(
-              textAlign: TextAlign.center,
-              decoration:
-                  kLoginTextFieldDecoration.copyWith(hintText: 'Email Address'),
-              onChanged: (value) {
-                _email = value.trim();
-              },
+            SizedBox(height: 25.0),
+            Text(
+              'Your User Details',
+              style: TextStyle(fontSize: 20.0),
             ),
-            SizedBox(height: 15.0),
-            TextFormField(
-              obscureText: true,
-              textAlign: TextAlign.center,
-              decoration:
-                  kLoginTextFieldDecoration.copyWith(hintText: 'Password'),
-              onChanged: (value) {
-                _password = value.trim();
-              },
-            ),
-            SizedBox(height: 15.0),
+            SizedBox(height: 25.0),
             TextFormField(
               textAlign: TextAlign.center,
               decoration:
@@ -123,33 +106,51 @@ class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
             TextFormField(
               textAlign: TextAlign.center,
               decoration:
-                  kLoginTextFieldDecoration.copyWith(hintText: 'Last Name'),
+                  kLoginTextFieldDecoration.copyWith(hintText: 'Email Address'),
               onChanged: (value) {
-                _lastName = value.trim();
+                _email = value.trim();
               },
               validator: (value) {
                 if (value!.isEmpty) {
-                  return 'Please enter a last name.';
+                  return 'Please enter an email address';
                 }
                 return null;
               },
             ),
-            CheckboxListTile(
-                title: Text(
-                  'Admin User',
-                  style: TextStyle(color: kPrimaryTextColour),
-                ),
-                value: _isAdmin,
-                onChanged: (value) {
-                  setState(() {
-                    _isAdmin = value!;
-                  });
-                }),
+            SizedBox(height: 15.0),
+            TextFormField(
+              obscureText: true,
+              textAlign: TextAlign.center,
+              decoration:
+                  kLoginTextFieldDecoration.copyWith(hintText: 'Password'),
+              onChanged: (value) {
+                _password = value.trim();
+              },
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter a password';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 15.0),
+            // CheckboxListTile(
+            //     title: Text(
+            //       'Admin User',
+            //       style: TextStyle(color: kPrimaryTextColour),
+            //     ),
+            //     value: _isAdmin,
+            //     onChanged: (value) {
+            //       setState(() {
+            //         _isAdmin = value!;
+            //       });
+            //     }),
+            SizedBox(height: 25.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 CustomButton(
-                  text: 'Register New User',
+                  text: 'Register New Family',
                   colour: kAccentColour,
                   radius: 32,
                   onPress: () async {
@@ -157,7 +158,9 @@ class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
                       showSpinner = true;
                     });
                     if (_familyRegistrationFormKey.currentState!.validate()) {
+                      _isAdmin = true;
                       createUser();
+                      addFamily(_familyName);
 
                       setState(() {
                         showSpinner = false;
@@ -208,4 +211,20 @@ showAlertDialog(BuildContext context, String message) {
       return alert;
     },
   );
+}
+
+void addFamily(name) {
+  CollectionReference reports = db.collection('families');
+
+  Future<void> addingReport() {
+    return reports
+        .add({
+          'familyName': name,
+          'created at': FieldValue.serverTimestamp(),
+        })
+        .then((value) => print("Family Added"))
+        .catchError((error) => print("Failed to add family: $error"));
+  }
+
+  addingReport();
 }
