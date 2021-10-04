@@ -17,9 +17,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late User loggedInUser;
-  late String loggedInUserName;
+  String loggedInUserName = '';
   late bool currentUserIsAdmin;
-  late String loggedInUserFamily;
+  String loggedInUserFamily = '';
 
   final _auth = FirebaseAuth.instance;
 

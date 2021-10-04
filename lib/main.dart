@@ -20,3 +20,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+//TODO: Use textcontrollers to get data

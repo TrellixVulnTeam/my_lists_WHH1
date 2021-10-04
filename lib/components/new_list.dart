@@ -7,14 +7,8 @@ import 'package:my_lists/components/list_field.dart';
 final db = FirebaseFirestore.instance;
 
 late User loggedInUser;
-late String title;
+String? title;
 late String item;
-
-List<Widget> listFields = [
-  ListField(
-    onChange: (value) => item = value,
-  ),
-];
 
 List<String> listItems = [];
 
@@ -27,10 +21,14 @@ class NewList extends StatefulWidget {
 
 class _NewListState extends State<NewList> {
   final _auth = FirebaseAuth.instance;
+  List<Widget> itemLines = [];
+  List<TextEditingController> controllers = [];
+  TextEditingController initialController = TextEditingController();
 
   @override
   void initState() {
     getCurrentUser();
+    controllers.add(initialController);
     super.initState();
   }
 
@@ -44,8 +42,7 @@ class _NewListState extends State<NewList> {
   @override
   void dispose() {
     super.dispose();
-    listFields = [];
-    listItems = [];
+    controllers.clear();
   }
 
   @override
@@ -69,18 +66,15 @@ class _NewListState extends State<NewList> {
                   },
                 ),
               ),
-              ListField(
-                onChange: (value) => item = value,
-              ),
+              ListField(controller: initialController),
               ListView(
                 shrinkWrap: true,
-                children: listFields,
+                children: itemLines,
               ),
               Row(
                 children: [
                   TextButton(
                     onPressed: () {
-                      _addItem();
                       _addLine();
                       setState(() {});
                     },
@@ -103,9 +97,10 @@ class _NewListState extends State<NewList> {
                             color: kPrimaryTextColour, fontSize: 25.0),
                       ),
                       onPressed: () {
+                        listItems.clear();
+                        itemLines.clear();
+                        title = '';
                         Navigator.pop(context);
-                        listFields = [];
-                        listItems = [];
                       },
                     ),
                     TextButton(
@@ -115,8 +110,14 @@ class _NewListState extends State<NewList> {
                             color: kPrimaryTextColour, fontSize: 25.0),
                       ),
                       onPressed: () {
-                        _addItem();
+                        // adding items to the list
+                        for (int i = 0; i < controllers.length; i++) {
+                          listItems = List.from(listItems)
+                            ..add(controllers[i].text);
+                        }
                         createList(title);
+                        listItems.clear();
+                        itemLines.clear();
                         Navigator.pop(context);
                       },
                     ),
@@ -129,26 +130,46 @@ class _NewListState extends State<NewList> {
       ),
     );
   }
+
+  void _addLine() {
+    TextEditingController controller = TextEditingController();
+    controllers.add(controller); //adding the current controller to the list
+
+    // .. notation is cascade operator, used to not repeat 'listItems'. This is equivalent to the next 2 lines commented out
+    itemLines = List.from(itemLines)
+      ..add(
+        ListField(controller: controller),
+      );
+    //itemLines = List.from(itemLines);
+    //itemLines.add(TextFormField(controller: controller));
+    setState(() {});
+  }
 }
 
-void _addLine() {
-  // .. notation is cascade operator, used to not repeat 'listItems'. This is equivalent to the next 2 lines commented out
-  listFields = List.from(listFields)
-    ..add(
-      ListField(
-        onChange: (value) => item = value,
-      ),
-    );
-  // listItems = List.from(listItems);
-  // listItems.add(ListField());
-}
-
-void _addItem() {
-  listItems = List.from(listItems);
-  listItems.add(item);
-}
+// void _addLine() {
+//   myFocusNode.requestFocus();
+//   // .. notation is cascade operator, used to not repeat 'listItems'. This is equivalent to the next 2 lines commented out
+//   listFields = List.from(listFields)
+//     ..add(
+//       ListField(
+//         controller: myTextController,
+//         myFocus: myFocusNode,
+//       ),
+//     );
+//   // listFields = List.from(listFields);
+//   // listFields.add(ListField());
+// }
+//
+// void _addItem() {
+//   item = myTextController.text;
+//   listItems = List.from(listItems)..add(item);
+// }
 
 void createList(title) {
+  if (title == '') {
+    title = ' ';
+  }
+
   DocumentReference lists = db
       .collection('users')
       .doc(loggedInUser.uid)
@@ -163,8 +184,8 @@ void createList(title) {
           'created at': FieldValue.serverTimestamp(),
           'created by': loggedInUser.email,
         })
-        .then((value) => print("Report Added"))
-        .catchError((error) => print("Failed to add report: $error"));
+        .then((value) => print("List Added with title $title"))
+        .catchError((error) => print("Failed to add list: $error"));
   }
 
   creatingList();
