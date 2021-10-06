@@ -9,6 +9,7 @@ final db = FirebaseFirestore.instance;
 late User loggedInUser;
 String? title;
 late String item;
+late FocusNode myFocus = FocusNode();
 
 List<String> listItems = [];
 
@@ -24,6 +25,7 @@ class _NewListState extends State<NewList> {
   List<Widget> itemLines = [];
   List<TextEditingController> controllers = [];
   TextEditingController initialController = TextEditingController();
+  late FocusNode dynamicFocus = FocusNode();
 
   @override
   void initState() {
@@ -43,6 +45,7 @@ class _NewListState extends State<NewList> {
   void dispose() {
     super.dispose();
     controllers.clear();
+    dynamicFocus.dispose();
   }
 
   @override
@@ -66,7 +69,10 @@ class _NewListState extends State<NewList> {
                   },
                 ),
               ),
-              ListField(controller: initialController),
+              ListField(
+                controller: initialController,
+                lineFocus: myFocus,
+              ),
               ListView(
                 shrinkWrap: true,
                 children: itemLines,
@@ -99,7 +105,7 @@ class _NewListState extends State<NewList> {
                       onPressed: () {
                         listItems.clear();
                         itemLines.clear();
-                        title = '';
+                        title = null;
                         Navigator.pop(context);
                       },
                     ),
@@ -115,9 +121,11 @@ class _NewListState extends State<NewList> {
                           listItems = List.from(listItems)
                             ..add(controllers[i].text);
                         }
+                        title == null ? title = 'Untitled' : title = title;
                         createList(title);
                         listItems.clear();
                         itemLines.clear();
+                        title = null;
                         Navigator.pop(context);
                       },
                     ),
@@ -132,13 +140,23 @@ class _NewListState extends State<NewList> {
   }
 
   void _addLine() {
+    List<FocusNode> focusList = [];
+    dynamicFocus = FocusNode();
+    for (int i = 0; i < itemLines.length; i++) {
+      focusList = List.from(focusList)..add(dynamicFocus);
+    }
+    dynamicFocus.requestFocus();
+
     TextEditingController controller = TextEditingController();
     controllers.add(controller); //adding the current controller to the list
 
     // .. notation is cascade operator, used to not repeat 'listItems'. This is equivalent to the next 2 lines commented out
     itemLines = List.from(itemLines)
       ..add(
-        ListField(controller: controller),
+        ListField(
+          controller: controller,
+          lineFocus: dynamicFocus,
+        ),
       );
     //itemLines = List.from(itemLines);
     //itemLines.add(TextFormField(controller: controller));
@@ -146,45 +164,20 @@ class _NewListState extends State<NewList> {
   }
 }
 
-// void _addLine() {
-//   myFocusNode.requestFocus();
-//   // .. notation is cascade operator, used to not repeat 'listItems'. This is equivalent to the next 2 lines commented out
-//   listFields = List.from(listFields)
-//     ..add(
-//       ListField(
-//         controller: myTextController,
-//         myFocus: myFocusNode,
-//       ),
-//     );
-//   // listFields = List.from(listFields);
-//   // listFields.add(ListField());
-// }
-//
-// void _addItem() {
-//   item = myTextController.text;
-//   listItems = List.from(listItems)..add(item);
-// }
-
 void createList(title) {
-  if (title == '') {
-    title = ' ';
-  }
-
-  DocumentReference lists = db
-      .collection('users')
-      .doc(loggedInUser.uid)
-      .collection('lists')
-      .doc(title);
+  CollectionReference lists =
+      db.collection('users').doc(loggedInUser.uid).collection('lists');
 
   Future<void> creatingList() {
     return lists
-        .set({
+        // use add instead of set to prevent overwriting
+        .add({
           'title': title,
           'body': listItems,
           'created at': FieldValue.serverTimestamp(),
           'created by': loggedInUser.email,
         })
-        .then((value) => print("List Added with title $title"))
+        .then((value) => print("List Added with title: $title"))
         .catchError((error) => print("Failed to add list: $error"));
   }
 

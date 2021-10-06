@@ -5,6 +5,7 @@ import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/new_list.dart';
 import 'package:my_lists/screens/login_screen.dart';
 import 'package:my_lists/screens/user_registration_screen.dart';
+import 'package:my_lists/components/docs_list.dart';
 
 final db = FirebaseFirestore.instance;
 
@@ -152,14 +153,9 @@ class _HomeScreenState extends State<HomeScreen> {
               textAlign: TextAlign.center,
             ),
           ),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 8.0,
-              crossAxisSpacing: 8.0,
-              children: [],
-            ),
-          ),
+          SizedBox(height: 10.0),
+          //
+          Expanded(child: DocsList()),
         ]),
       ),
     );

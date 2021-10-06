@@ -20,4 +20,9 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-//TODO: Use textcontrollers to get data
+// TODO: list details screen + tick off items
+// TODO: bottom menu
+// TODO: share lists within family
+// TODO: private toggle
+// TODO: different types of docs, not just lists
+// TODO: more freeform GridView
