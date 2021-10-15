@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:my_lists/routes.dart';
 import 'package:my_lists/theme/style.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:my_lists/models/item_data.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,4 +27,3 @@ class MyApp extends StatelessWidget {
 // TODO: share lists within family
 // TODO: private toggle
 // TODO: different types of docs, not just lists
-// TODO: more freeform GridView

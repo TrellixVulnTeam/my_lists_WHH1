@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_lists/components/docs_list.dart';
 import 'package:my_lists/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_lists/components/list_field.dart';
+import 'package:my_lists/models/item.dart';
 
 final db = FirebaseFirestore.instance;
 
@@ -11,7 +13,9 @@ String? title;
 late String item;
 late FocusNode myFocus = FocusNode();
 
-List<String> listItems = [];
+//List<String> listItems = [];
+List<SingleItem> listItems = [];
+var mapItems = {};
 
 class NewList extends StatefulWidget {
   static const String id = 'new_list';
@@ -26,6 +30,7 @@ class _NewListState extends State<NewList> {
   List<TextEditingController> controllers = [];
   TextEditingController initialController = TextEditingController();
   late FocusNode dynamicFocus = FocusNode();
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
@@ -45,6 +50,8 @@ class _NewListState extends State<NewList> {
   void dispose() {
     super.dispose();
     controllers.clear();
+    listItems.clear();
+    mapItems.clear();
     dynamicFocus.dispose();
   }
 
@@ -52,48 +59,53 @@ class _NewListState extends State<NewList> {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Card(
-          color: kLightAccentColour,
-          child: Column(
-            //mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0, top: 15.0),
-                child: TextField(
-                  style: TextStyle(fontSize: 20.0),
-                  decoration: InputDecoration(
-                      hintText: 'Title', border: InputBorder.none),
-                  onChanged: (value) {
-                    title = value.trim();
-                  },
-                ),
-              ),
-              ListField(
-                controller: initialController,
-                lineFocus: myFocus,
-              ),
-              ListView(
-                shrinkWrap: true,
-                children: itemLines,
-              ),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      _addLine();
-                      setState(() {});
+        padding: EdgeInsets.all(25.0),
+        child: SingleChildScrollView(
+          controller: scrollController,
+          child: Card(
+            color: kLightAccentColour,
+            child: Column(
+              //mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0, top: 15.0),
+                  child: TextField(
+                    style: TextStyle(fontSize: 20.0),
+                    decoration: InputDecoration(
+                        hintText: 'Title', border: InputBorder.none),
+                    onChanged: (value) {
+                      title = value.trim();
                     },
-                    child: Icon(
-                      Icons.add,
-                      color: kPrimaryTextColour,
-                    ),
-                  )
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 15.0),
-                child: Row(
+                  ),
+                ),
+                ListField(
+                  controller: initialController,
+                  lineFocus: myFocus,
+                ),
+                ListView(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  children: itemLines,
+                ),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        _addLine();
+                        scrollController.animateTo(
+                            scrollController.position.maxScrollExtent,
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.ease);
+                        setState(() {});
+                      },
+                      child: Icon(
+                        Icons.add,
+                        color: kPrimaryTextColour,
+                      ),
+                    )
+                  ],
+                ),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
@@ -109,30 +121,46 @@ class _NewListState extends State<NewList> {
                         Navigator.pop(context);
                       },
                     ),
-                    TextButton(
-                      child: Text(
-                        'Create List',
-                        style: TextStyle(
-                            color: kPrimaryTextColour, fontSize: 25.0),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15.0),
+                      child: TextButton(
+                        child: Text(
+                          'Create List',
+                          style: TextStyle(
+                              color: kPrimaryTextColour, fontSize: 25.0),
+                        ),
+                        onPressed: () {
+                          for (int i = 0; i < controllers.length; i++) {
+                            SingleItem currentItem = SingleItem(
+                                name: controllers[i].text, isDone: false);
+
+                            listItems = List.from(listItems)..add(currentItem);
+
+                            listItems.forEach(
+                              (item) {
+                                mapItems[item.name] = {'isDone': item.isDone};
+                              },
+                            );
+                          }
+
+                          title == null ? title = 'Untitled' : title = title;
+                          createList(title);
+                          listItems.clear();
+                          itemLines.clear();
+                          title = null;
+                          Navigator.of(context).pop();
+                        },
                       ),
-                      onPressed: () {
-                        // adding items to the list
-                        for (int i = 0; i < controllers.length; i++) {
-                          listItems = List.from(listItems)
-                            ..add(controllers[i].text);
-                        }
-                        title == null ? title = 'Untitled' : title = title;
-                        createList(title);
-                        listItems.clear();
-                        itemLines.clear();
-                        title = null;
-                        Navigator.pop(context);
-                      },
                     ),
                   ],
                 ),
-              ),
-            ],
+                Padding(
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: SizedBox(height: 10.0),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -165,15 +193,18 @@ class _NewListState extends State<NewList> {
 }
 
 void createList(title) {
-  CollectionReference lists =
-      db.collection('users').doc(loggedInUser.uid).collection('lists');
+  DocumentReference lists = db
+      .collection('users')
+      .doc(loggedInUser.uid)
+      .collection('lists')
+      .doc(title);
 
   Future<void> creatingList() {
     return lists
         // use add instead of set to prevent overwriting
-        .add({
+        .set({
           'title': title,
-          'body': listItems,
+          'body': mapItems,
           'created at': FieldValue.serverTimestamp(),
           'created by': loggedInUser.email,
         })

@@ -65,6 +65,49 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Text('My Lists'),
           backgroundColor: kLightAccentColour,
         ),
+        bottomNavigationBar: BottomAppBar(
+          color: kSuperLightAccentColour,
+          shape: CircularNotchedRectangle(),
+          notchMargin: 5,
+          child: Row(
+            //children inside bottom appbar
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(
+                  Icons.menu,
+                  color: Colors.white,
+                ),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.favorite,
+                  color: Colors.white,
+                ),
+                onPressed: () {},
+              ),
+              Padding(
+                padding: EdgeInsets.only(right: 90),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.people,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {},
+                ),
+              )
+            ],
+          ),
+        ),
         endDrawer: Drawer(
           child: ListView(
             padding: EdgeInsets.zero,
@@ -112,6 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           foregroundColor: kPrimaryTextColour,

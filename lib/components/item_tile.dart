@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 
 class ItemTile extends StatelessWidget {
-  late final bool isDone;
-  late final String item;
-  // late final Function checkboxCallback;
+  final bool isDone;
+  late final String name;
+  final void Function() onTapped;
 
   // Constructor initialises the variables
-  ItemTile({required this.isDone, required this.item});
+  ItemTile({required this.isDone, required this.name, required this.onTapped});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(item,
-          style: TextStyle(
-              decoration: isDone ? TextDecoration.lineThrough : null)),
+      title: Text(
+        name,
+        style: TextStyle(
+          decoration: isDone ? TextDecoration.lineThrough : null,
+        ),
+      ),
+      onTap: onTapped,
     );
   }
 }
