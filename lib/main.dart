@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-// TODO: list details screen + tick off items
+
 // TODO: bottom menu
 // TODO: share lists within family
 // TODO: private toggle

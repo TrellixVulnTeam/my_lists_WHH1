@@ -10,6 +10,9 @@ final db = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
 var listTitle;
 late List listBody = [];
+Map newMap = {};
+late String name;
+late bool isDone;
 
 class DocsList extends StatelessWidget {
   @override
@@ -40,6 +43,7 @@ class DocsList extends StatelessWidget {
                     .entries
                     .map((e) => SingleItem(name: e.key, isDone: e.value))
                     .toList();
+
                 return Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),

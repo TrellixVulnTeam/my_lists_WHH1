@@ -138,11 +138,10 @@ class _NewListState extends State<NewList> {
 
                             listItems.forEach(
                               (item) {
-                                mapItems[item.name] = {'isDone': item.isDone};
+                                mapItems[item.name] = item.isDone;
                               },
                             );
                           }
-
                           title == null ? title = 'Untitled' : title = title;
                           createList(title);
                           listItems.clear();

@@ -57,33 +57,19 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(15.0),
-            // child: ListView.builder(
-            //     shrinkWrap: true,
-            //     itemCount: listBody.length,
-            //     itemBuilder: (context, int index) {
-            //       return ItemTile(
-            //           isDone: listBody[index].isDone,
-            //           name: listBody[index].name,
-            //           onTapped: () {
-            //             listBody[index].isDone = !listBody[index].isDone;
-            //             setState(() {});
-            //           });
-            //     }),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                for (var item in listBody)
-                  ItemTile(
-                    isDone: item.isDone,
-                    name: item.name,
-                    onTapped: () {
-                      toggleDone(
-                          item.name, listTitle, (item.isDone = !item.isDone));
-                      setState(() {});
-                    },
-                  ),
-              ],
-            ),
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: listBody.length,
+                itemBuilder: (context, int index) {
+                  return ItemTile(
+                      isDone: listBody[index].isDone,
+                      name: listBody[index].name,
+                      onTapped: () {
+                        toggleDone(listBody[index].name, listTitle,
+                            (listBody[index].isDone = !listBody[index].isDone));
+                        setState(() {});
+                      });
+                }),
           )
         ],
       ),
@@ -97,5 +83,5 @@ void toggleDone(String itemName, String listTitle, bool isDone) {
       .doc(loggedInUser.uid)
       .collection('lists')
       .doc(listTitle)
-      .update({'body.$itemName.isDone': isDone}).then((_) {});
+      .update({'body.$itemName': isDone}).then((_) {});
 }
