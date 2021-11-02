@@ -1,13 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/new_list.dart';
 import 'package:my_lists/screens/login_screen.dart';
 import 'package:my_lists/screens/user_registration_screen.dart';
 import 'package:my_lists/components/docs_list.dart';
+import 'package:my_lists/components/new_text.dart';
 
 final db = FirebaseFirestore.instance;
+String docType = 'list';
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
@@ -156,18 +159,75 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          foregroundColor: kPrimaryTextColour,
-          backgroundColor: kAccentColour,
-          onPressed: () {
+        floatingActionButton: InkWell(
+          onLongPress: () {
             showDialog(
               context: context,
-              builder: (BuildContext context) {
-                return NewList();
+              builder: (context) {
+                return AlertDialog(
+                  backgroundColor: kSuperLightAccentColour,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          docType = 'list';
+                          Navigator.pop(context);
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return NewList();
+                            },
+                          );
+                        },
+                        child: Text(
+                          'New List',
+                          style: TextStyle(
+                              fontSize: 25, color: kPrimaryTextColour),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () {
+                          docType = 'note';
+                          Navigator.pop(context);
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return NewText();
+                            },
+                          );
+                        },
+                        child: Text(
+                          'New Note',
+                          style: TextStyle(
+                              fontSize: 25, color: kPrimaryTextColour),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               },
             );
           },
+          child: FloatingActionButton(
+            child: Icon(Icons.add),
+            foregroundColor: kPrimaryTextColour,
+            backgroundColor: kAccentColour,
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  if (docType == 'list') {
+                    return NewList();
+                  } else
+                    return NewText();
+                },
+              );
+            },
+          ),
         ),
         body: Column(children: [
           Container(

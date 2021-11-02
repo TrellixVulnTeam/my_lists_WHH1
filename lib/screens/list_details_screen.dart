@@ -12,8 +12,9 @@ late User loggedInUser;
 class ListDetailsScreen extends StatefulWidget {
   final listTitle;
   final List listBody;
+  final listID;
 
-  ListDetailsScreen({this.listTitle, required this.listBody});
+  ListDetailsScreen({this.listTitle, required this.listBody, this.listID});
 
   @override
   _ListDetailsScreenState createState() => _ListDetailsScreenState();
@@ -65,7 +66,7 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                       isDone: listBody[index].isDone,
                       name: listBody[index].name,
                       onTapped: () {
-                        toggleDone(listBody[index].name, listTitle,
+                        toggleDone(listBody[index].name, listID,
                             (listBody[index].isDone = !listBody[index].isDone));
                         setState(() {});
                       });
@@ -77,11 +78,11 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
   }
 }
 
-void toggleDone(String itemName, String listTitle, bool isDone) {
+void toggleDone(String itemName, String listID, bool isDone) {
   FirebaseFirestore.instance
       .collection('users')
       .doc(loggedInUser.uid)
-      .collection('lists')
-      .doc(listTitle)
+      .collection('docs')
+      .doc(listID)
       .update({'body.$itemName': isDone}).then((_) {});
 }

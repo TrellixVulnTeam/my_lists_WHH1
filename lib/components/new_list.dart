@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_lists/components/docs_list.dart';
 import 'package:my_lists/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_lists/components/list_field.dart';
@@ -192,20 +191,18 @@ class _NewListState extends State<NewList> {
 }
 
 void createList(title) {
-  DocumentReference lists = db
-      .collection('users')
-      .doc(loggedInUser.uid)
-      .collection('lists')
-      .doc(title);
+  CollectionReference docs =
+      db.collection('users').doc(loggedInUser.uid).collection('docs');
 
   Future<void> creatingList() {
-    return lists
+    return docs
         // use add instead of set to prevent overwriting
-        .set({
+        .add({
           'title': title,
           'body': mapItems,
           'created at': FieldValue.serverTimestamp(),
           'created by': loggedInUser.email,
+          'type': 'list',
         })
         .then((value) => print("List Added with title: $title"))
         .catchError((error) => print("Failed to add list: $error"));
