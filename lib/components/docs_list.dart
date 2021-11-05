@@ -17,8 +17,32 @@ late bool isDone;
 late String listID;
 late String docText;
 late String noteID;
+late User loggedInUser;
 
-class DocsList extends StatelessWidget {
+class DocsList extends StatefulWidget {
+  @override
+  _DocsListState createState() => _DocsListState();
+}
+
+class _DocsListState extends State<DocsList> {
+  @override
+  void initState() {
+    getCurrentUser();
+    super.initState();
+  }
+
+  void getCurrentUser() {
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      loggedInUser = currentUser;
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     CollectionReference docs =
@@ -60,6 +84,48 @@ class DocsList extends StatelessWidget {
                   ),
                   color: kLightAccentColour,
                   child: InkWell(
+                    onLongPress: () {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Center(
+                                child: Text('Delete this document?'),
+                              ),
+                              backgroundColor: kSuperLightAccentColour,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(32.0))),
+                              actions: [
+                                TextButton(
+                                  child: Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: kPrimaryTextColour),
+                                  ),
+                                  onPressed: () {
+                                    getCurrentUser();
+                                    deleteDoc(document.id);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: kPrimaryTextColour),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          });
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(15.0),
                       child: Column(
@@ -136,4 +202,13 @@ class DocsList extends StatelessWidget {
           );
         });
   }
+}
+
+void deleteDoc(var docID) {
+  FirebaseFirestore.instance
+      .collection('users')
+      .doc(loggedInUser.uid)
+      .collection('docs')
+      .doc(docID)
+      .delete();
 }
