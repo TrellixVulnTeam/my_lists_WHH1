@@ -134,7 +134,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(color: kPrimaryTextColour),
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, UserRegistrationScreen.id);
+                  Navigator.pushNamed(context, UserRegistrationScreen.id,
+                      arguments: {'currentUserFamily': loggedInUserFamily});
                 },
               ),
               ListTile(
