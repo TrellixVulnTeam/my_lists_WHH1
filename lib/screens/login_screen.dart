@@ -49,8 +49,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 TextField(
                   textAlign: TextAlign.center,
-                  decoration:
-                      kLoginTextFieldDecoration.copyWith(hintText: 'Username'),
+                  decoration: kLoginTextFieldDecoration.copyWith(
+                      hintText: 'Email Address'),
                   onChanged: (value) {
                     email = value.trim();
                   },
