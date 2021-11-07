@@ -15,7 +15,6 @@ late FocusNode myFocus = FocusNode();
 late bool currentUserIsAdmin;
 var loggedInUserFamily = '';
 
-//List<String> listItems = [];
 List<SingleItem> listItems = [];
 var mapItems = {};
 
@@ -229,9 +228,6 @@ class _NewListState extends State<NewList> {
 }
 
 void createList(title) {
-  // CollectionReference docs =
-  //     db.collection('users').doc(loggedInUser.uid).collection('docs');
-
   CollectionReference docs =
       db.collection('families').doc(loggedInUserFamily).collection('docs');
 

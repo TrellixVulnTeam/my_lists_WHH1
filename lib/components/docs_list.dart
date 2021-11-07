@@ -113,6 +113,7 @@ class _DocsListState extends State<DocsList> {
                 } else if (document['type'] == 'note') {
                   docText = document['body'];
                 }
+                // Visibility to filter out private docs
                 return Visibility(
                   visible: isVisible,
                   child: Card(

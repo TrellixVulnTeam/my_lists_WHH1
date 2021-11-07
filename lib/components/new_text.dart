@@ -2,14 +2,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:my_lists/components/list_field.dart';
-import 'package:my_lists/models/item.dart';
 
 final db = FirebaseFirestore.instance;
 
 late User loggedInUser;
 String? title;
 late String text;
+late bool currentUserIsAdmin;
+var loggedInUserFamily = '';
+bool isPrivate = false;
 
 class NewText extends StatefulWidget {
   static const String id = 'new_list';
@@ -24,14 +25,33 @@ class _NewTextState extends State<NewText> {
 
   @override
   void initState() {
-    getCurrentUser();
+    getCurrentUserDetails();
     super.initState();
   }
 
-  void getCurrentUser() {
+  void getCurrentUserDetails() {
     final currentUser = _auth.currentUser;
     if (currentUser != null) {
       loggedInUser = currentUser;
+
+      // Get the whole user doc and then process the snapshot to get to the fields
+      Future<String> getDetails() async {
+        DocumentReference userRef =
+            db.collection('users').doc(loggedInUser.uid);
+        String firstName = '';
+        String family = '';
+        await userRef.get().then((snapshot) {
+          firstName = snapshot['firstName'];
+          family = snapshot['family'];
+          currentUserIsAdmin = snapshot['isAdmin'];
+        });
+        setState(() {
+          loggedInUserFamily = family;
+        });
+        return firstName;
+      }
+
+      getDetails();
     }
   }
 
@@ -71,6 +91,22 @@ class _NewTextState extends State<NewText> {
                     autofocus: true,
                     maxLines: null,
                   ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Private Note',
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                    Checkbox(
+                        value: isPrivate,
+                        onChanged: (value) {
+                          setState(() {
+                            isPrivate = value!;
+                          });
+                        })
+                  ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -120,7 +156,7 @@ class _NewTextState extends State<NewText> {
 
   void createNote(title) {
     CollectionReference docs =
-        db.collection('users').doc(loggedInUser.uid).collection('docs');
+        db.collection('families').doc(loggedInUserFamily).collection('docs');
 
     Future<void> creatingNote() {
       return docs
@@ -131,6 +167,7 @@ class _NewTextState extends State<NewText> {
             'created at': FieldValue.serverTimestamp(),
             'created by': loggedInUser.email,
             'type': 'note',
+            'isPrivate': isPrivate,
           })
           .then((value) => print("Note Added with title: $title"))
           .catchError((error) => print("Failed to add note: $error"));

@@ -22,6 +22,6 @@ class MyApp extends StatelessWidget {
 }
 
 // TODO: bottom menu
-// TODO: private toggle
 // TODO: amend lists or note after creation
 // TODO: work out security on DB????
+// TODO: refactor getUserDetails
