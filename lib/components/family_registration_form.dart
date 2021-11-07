@@ -132,18 +132,6 @@ class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
                 return null;
               },
             ),
-            SizedBox(height: 15.0),
-            // CheckboxListTile(
-            //     title: Text(
-            //       'Admin User',
-            //       style: TextStyle(color: kPrimaryTextColour),
-            //     ),
-            //     value: _isAdmin,
-            //     onChanged: (value) {
-            //       setState(() {
-            //         _isAdmin = value!;
-            //       });
-            //     }),
             SizedBox(height: 25.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -213,11 +201,11 @@ showAlertDialog(BuildContext context, String message) {
 }
 
 void addFamily(name) {
-  CollectionReference reports = db.collection('families');
+  DocumentReference families = db.collection('families').doc(name);
 
-  Future<void> addingReport() {
-    return reports
-        .add({
+  Future<void> addingFamily() {
+    return families
+        .set({
           'familyName': name,
           'created at': FieldValue.serverTimestamp(),
         })
@@ -225,5 +213,5 @@ void addFamily(name) {
         .catchError((error) => print("Failed to add family: $error"));
   }
 
-  addingReport();
+  addingFamily();
 }

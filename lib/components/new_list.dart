@@ -9,8 +9,11 @@ final db = FirebaseFirestore.instance;
 
 late User loggedInUser;
 String? title;
+bool isPrivate = false;
 late String item;
 late FocusNode myFocus = FocusNode();
+late bool currentUserIsAdmin;
+var loggedInUserFamily = '';
 
 //List<String> listItems = [];
 List<SingleItem> listItems = [];
@@ -33,15 +36,34 @@ class _NewListState extends State<NewList> {
 
   @override
   void initState() {
-    getCurrentUser();
+    getCurrentUserDetails();
     controllers.add(initialController);
     super.initState();
   }
 
-  void getCurrentUser() {
+  void getCurrentUserDetails() {
     final currentUser = _auth.currentUser;
     if (currentUser != null) {
       loggedInUser = currentUser;
+
+      // Get the whole user doc and then process the snapshot to get to the fields
+      Future<String> getDetails() async {
+        DocumentReference userRef =
+            db.collection('users').doc(loggedInUser.uid);
+        String firstName = '';
+        String family = '';
+        await userRef.get().then((snapshot) {
+          firstName = snapshot['firstName'];
+          family = snapshot['family'];
+          currentUserIsAdmin = snapshot['isAdmin'];
+        });
+        setState(() {
+          loggedInUserFamily = family;
+        });
+        return firstName;
+      }
+
+      getDetails();
     }
   }
 
@@ -107,11 +129,27 @@ class _NewListState extends State<NewList> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Text(
+                      'Private List',
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                    Checkbox(
+                        value: isPrivate,
+                        onChanged: (value) {
+                          setState(() {
+                            isPrivate = value!;
+                          });
+                        })
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
                     TextButton(
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                            color: kPrimaryTextColour, fontSize: 25.0),
+                            color: kPrimaryTextColour, fontSize: 20.0),
                       ),
                       onPressed: () {
                         listItems.clear();
@@ -126,7 +164,7 @@ class _NewListState extends State<NewList> {
                         child: Text(
                           'Create List',
                           style: TextStyle(
-                              color: kPrimaryTextColour, fontSize: 25.0),
+                              color: kPrimaryTextColour, fontSize: 20.0),
                         ),
                         onPressed: () {
                           for (int i = 0; i < controllers.length; i++) {
@@ -191,8 +229,11 @@ class _NewListState extends State<NewList> {
 }
 
 void createList(title) {
+  // CollectionReference docs =
+  //     db.collection('users').doc(loggedInUser.uid).collection('docs');
+
   CollectionReference docs =
-      db.collection('users').doc(loggedInUser.uid).collection('docs');
+      db.collection('families').doc(loggedInUserFamily).collection('docs');
 
   Future<void> creatingList() {
     return docs
@@ -203,6 +244,7 @@ void createList(title) {
           'created at': FieldValue.serverTimestamp(),
           'created by': loggedInUser.email,
           'type': 'list',
+          'isPrivate': isPrivate,
         })
         .then((value) => print("List Added with title: $title"))
         .catchError((error) => print("Failed to add list: $error"));

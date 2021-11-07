@@ -22,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late User loggedInUser;
   String loggedInUserName = '';
-  late bool currentUserIsAdmin;
+  bool currentUserIsAdmin = false;
   String loggedInUserFamily = '';
 
   final _auth = FirebaseAuth.instance;
@@ -79,13 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
             children: <Widget>[
               IconButton(
                 icon: Icon(
-                  Icons.menu,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(
                   Icons.search,
                   color: Colors.white,
                 ),
@@ -128,23 +121,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              ListTile(
-                title: Text(
-                  'Register New User',
-                  style: TextStyle(color: kPrimaryTextColour),
+              if (currentUserIsAdmin)
+                ListTile(
+                  title: Text(
+                    'Register New User',
+                    style: TextStyle(color: kPrimaryTextColour),
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, UserRegistrationScreen.id,
+                        arguments: {'currentUserFamily': loggedInUserFamily});
+                  },
                 ),
-                onTap: () {
-                  Navigator.pushNamed(context, UserRegistrationScreen.id,
-                      arguments: {'currentUserFamily': loggedInUserFamily});
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Edit Users',
-                  style: TextStyle(color: kPrimaryTextColour),
+              if (currentUserIsAdmin)
+                ListTile(
+                  title: Text(
+                    'Edit Users',
+                    style: TextStyle(color: kPrimaryTextColour),
+                  ),
+                  onTap: () {},
                 ),
-                onTap: () {},
-              ),
 
               ListTile(
                 title: Text(
@@ -252,10 +247,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Container(
-            child: Text(
-              'Here\'s the latest for the $loggedInUserFamily family',
-              style: TextStyle(fontSize: 25.0),
-              textAlign: TextAlign.center,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 10.0, left: 10.0),
+              child: Text(
+                'Here\'s the latest for the $loggedInUserFamily family',
+                style: TextStyle(fontSize: 25.0),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
           SizedBox(height: 10.0),
