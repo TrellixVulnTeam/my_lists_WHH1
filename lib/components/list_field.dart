@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 
 class ListField extends StatelessWidget {
-  // Used to grab content of TextField
-  final Function(String) onChange;
+  final controller;
+  final FocusNode lineFocus;
 
-  ListField({required this.onChange});
+  ListField({this.controller, required this.lineFocus});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 20.0, right: 20.0),
       child: TextField(
-        onChanged: onChange,
+        controller: controller,
+        focusNode: lineFocus,
+        autofocus: true,
         decoration: InputDecoration(
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: kPrimaryTextColour),

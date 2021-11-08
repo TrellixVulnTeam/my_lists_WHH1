@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'My Lists',
       theme: appTheme(),
       initialRoute: '/',
       routes: routes,
@@ -21,4 +21,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-//TODO: Create new user with usual function and create family separately
+// TODO: bottom menu
+// TODO: amend lists or note after creation
+// TODO: work out security on DB????
+// TODO: refactor getUserDetails
