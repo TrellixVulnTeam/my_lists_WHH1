@@ -34,12 +34,6 @@ class _DocsListState extends State<DocsList> {
     super.initState();
   }
 
-  // void getCurrentUser() {
-  //   final currentUser = _auth.currentUser;
-  //   if (currentUser != null) {
-  //     loggedInUser = currentUser;
-  //   }
-  // }
   void getCurrentUserDetails() {
     final currentUser = _auth.currentUser;
     if (currentUser != null) {
@@ -68,6 +62,7 @@ class _DocsListState extends State<DocsList> {
 
   @override
   void dispose() {
+    listBody.clear();
     super.dispose();
   }
 
@@ -246,8 +241,8 @@ class _DocsListState extends State<DocsList> {
 
 void deleteDoc(var docID) {
   FirebaseFirestore.instance
-      .collection('users')
-      .doc(loggedInUser.uid)
+      .collection('families')
+      .doc(loggedInUserFamily)
       .collection('docs')
       .doc(docID)
       .delete();

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:my_lists/routes.dart';
 import 'package:my_lists/theme/style.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:my_lists/models/db_service.dart';
+import 'package:my_lists/models/models.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +27,6 @@ class MyApp extends StatelessWidget {
 
 // TODO: bottom menu
 // TODO: amend lists or note after creation
+
 // TODO: work out security on DB????
 // TODO: refactor getUserDetails
-// TODO: commit to get rid of API key

@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 final db = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
 late User loggedInUser;
+var loggedInUserFamily = '';
 
 class ListDetailsScreen extends StatefulWidget {
   final listTitle;
@@ -23,14 +24,33 @@ class ListDetailsScreen extends StatefulWidget {
 class _ListDetailsScreenState extends State<ListDetailsScreen> {
   @override
   void initState() {
-    getCurrentUser();
+    getCurrentUserDetails();
     super.initState();
   }
 
-  void getCurrentUser() {
+  void getCurrentUserDetails() {
     final currentUser = _auth.currentUser;
     if (currentUser != null) {
       loggedInUser = currentUser;
+
+      // Get the whole user doc and then process the snapshot to get to the fields
+      Future<String> getDetails() async {
+        DocumentReference userRef =
+            db.collection('users').doc(loggedInUser.uid);
+        String firstName = '';
+        String family = '';
+        await userRef.get().then((snapshot) {
+          firstName = snapshot['firstName'];
+          family = snapshot['family'];
+          currentUserIsAdmin = snapshot['isAdmin'];
+        });
+        setState(() {
+          loggedInUserFamily = family;
+        });
+        return firstName;
+      }
+
+      getDetails();
     }
   }
 
@@ -66,9 +86,13 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                       isDone: listBody[index].isDone,
                       name: listBody[index].name,
                       onTapped: () {
-                        toggleDone(listBody[index].name, listID,
-                            (listBody[index].isDone = !listBody[index].isDone));
-                        setState(() {});
+                        setState(() {
+                          toggleDone(
+                              listBody[index].name,
+                              listID,
+                              (listBody[index].isDone =
+                                  !listBody[index].isDone));
+                        });
                       });
                 }),
           )
@@ -80,8 +104,8 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
 
 void toggleDone(String itemName, String listID, bool isDone) {
   FirebaseFirestore.instance
-      .collection('users')
-      .doc(loggedInUser.uid)
+      .collection('families')
+      .doc(loggedInUserFamily)
       .collection('docs')
       .doc(listID)
       .update({'body.$itemName': isDone}).then((_) {});
