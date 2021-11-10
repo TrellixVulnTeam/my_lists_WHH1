@@ -4,10 +4,10 @@ import 'package:my_lists/screens/home_screen.dart';
 import 'package:my_lists/screens/login_screen.dart';
 import 'package:my_lists/screens/user_registration_screen.dart';
 import 'package:my_lists/screens/family_registration_screen.dart';
-import 'package:my_lists/screens/test_screen.dart';
 
 final Map<String, WidgetBuilder> routes = <String, WidgetBuilder>{
-  '/': (context) => Profile(),
+  '/': (context) => HomeScreen(),
+  'Login': (context) => LoginScreen(),
   HomeScreen.id: (context) => HomeScreen(),
   NewList.id: (context) => NewList(),
   LoginScreen.id: (context) => LoginScreen(),

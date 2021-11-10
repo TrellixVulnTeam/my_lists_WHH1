@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:my_lists/components/docs_list.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/item_tile.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:my_lists/models/models.dart';
 
 final db = FirebaseFirestore.instance;
-final _auth = FirebaseAuth.instance;
-late User loggedInUser;
-var loggedInUserFamily = '';
 
 class ListDetailsScreen extends StatefulWidget {
   final listTitle;
@@ -24,34 +22,7 @@ class ListDetailsScreen extends StatefulWidget {
 class _ListDetailsScreenState extends State<ListDetailsScreen> {
   @override
   void initState() {
-    getCurrentUserDetails();
     super.initState();
-  }
-
-  void getCurrentUserDetails() {
-    final currentUser = _auth.currentUser;
-    if (currentUser != null) {
-      loggedInUser = currentUser;
-
-      // Get the whole user doc and then process the snapshot to get to the fields
-      Future<String> getDetails() async {
-        DocumentReference userRef =
-            db.collection('users').doc(loggedInUser.uid);
-        String firstName = '';
-        String family = '';
-        await userRef.get().then((snapshot) {
-          firstName = snapshot['firstName'];
-          family = snapshot['family'];
-          currentUserIsAdmin = snapshot['isAdmin'];
-        });
-        setState(() {
-          loggedInUserFamily = family;
-        });
-        return firstName;
-      }
-
-      getDetails();
-    }
   }
 
   @override
@@ -62,6 +33,7 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserData>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('My Lists'),
@@ -91,7 +63,8 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                               listBody[index].name,
                               listID,
                               (listBody[index].isDone =
-                                  !listBody[index].isDone));
+                                  !listBody[index].isDone),
+                              user.family);
                         });
                       });
                 }),
@@ -102,10 +75,11 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
   }
 }
 
-void toggleDone(String itemName, String listID, bool isDone) {
+void toggleDone(
+    String itemName, String listID, bool isDone, String? userFamily) {
   FirebaseFirestore.instance
       .collection('families')
-      .doc(loggedInUserFamily)
+      .doc(userFamily)
       .collection('docs')
       .doc(listID)
       .update({'body.$itemName': isDone}).then((_) {});

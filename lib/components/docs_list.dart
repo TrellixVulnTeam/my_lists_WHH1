@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_lists/constants.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:my_lists/screens/list_details_screen.dart';
 import 'package:my_lists/models/item.dart';
 import 'package:my_lists/screens/note_details_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:my_lists/models/models.dart';
 
 final db = FirebaseFirestore.instance;
-final _auth = FirebaseAuth.instance;
 var listTitle;
 late List listBody = [];
 Map newMap = {};
-late String name;
-late bool isDone;
 late String listID;
 late String docText;
 late String noteID;
-late User loggedInUser;
-var loggedInUserFamily = '';
-late bool currentUserIsAdmin;
 bool isVisible = true;
 
 class DocsList extends StatefulWidget {
@@ -30,34 +25,7 @@ class DocsList extends StatefulWidget {
 class _DocsListState extends State<DocsList> {
   @override
   void initState() {
-    getCurrentUserDetails();
     super.initState();
-  }
-
-  void getCurrentUserDetails() {
-    final currentUser = _auth.currentUser;
-    if (currentUser != null) {
-      loggedInUser = currentUser;
-
-      // Get the whole user doc and then process the snapshot to get to the fields
-      Future<String> getDetails() async {
-        DocumentReference userRef =
-            db.collection('users').doc(loggedInUser.uid);
-        String firstName = '';
-        String family = '';
-        await userRef.get().then((snapshot) {
-          firstName = snapshot['firstName'];
-          family = snapshot['family'];
-          currentUserIsAdmin = snapshot['isAdmin'];
-        });
-        setState(() {
-          loggedInUserFamily = family;
-        });
-        return firstName;
-      }
-
-      getDetails();
-    }
   }
 
   @override
@@ -68,10 +36,10 @@ class _DocsListState extends State<DocsList> {
 
   @override
   Widget build(BuildContext context) {
-    // CollectionReference docs =
-    //     db.collection('users').doc(_auth.currentUser!.uid).collection('docs');
+    final user = Provider.of<UserData>(context);
+
     CollectionReference docs =
-        db.collection('families').doc(loggedInUserFamily).collection('docs');
+        db.collection('families').doc(user.family).collection('docs');
 
     return StreamBuilder<QuerySnapshot>(
         stream: docs.orderBy('created at', descending: true).snapshots(),
@@ -93,7 +61,7 @@ class _DocsListState extends State<DocsList> {
               crossAxisSpacing: 2.0,
               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                 if (document['isPrivate'] == true &&
-                    document['created by'] != loggedInUser.email) {
+                    document['created by'] != user.email) {
                   isVisible = false;
                 } else
                   isVisible = true;
@@ -139,8 +107,7 @@ class _DocsListState extends State<DocsList> {
                                           color: kPrimaryTextColour),
                                     ),
                                     onPressed: () {
-                                      getCurrentUserDetails();
-                                      deleteDoc(document.id);
+                                      deleteDoc(document.id, user.family);
                                       Navigator.pop(context);
                                     },
                                   ),
@@ -239,10 +206,10 @@ class _DocsListState extends State<DocsList> {
   }
 }
 
-void deleteDoc(var docID) {
+void deleteDoc(var docID, String? userFamily) {
   FirebaseFirestore.instance
       .collection('families')
-      .doc(loggedInUserFamily)
+      .doc(userFamily)
       .collection('docs')
       .doc(docID)
       .delete();

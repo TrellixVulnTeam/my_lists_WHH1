@@ -16,17 +16,37 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'My Lists',
-      theme: appTheme(),
-      initialRoute: '/',
-      routes: routes,
-    );
+    // Check for User to be able to use it in the StreamProvider below
+    final _auth = FirebaseAuth.instance;
+    final authUser = _auth.currentUser;
+    if (authUser == null) {
+      return MaterialApp(
+        title: 'My Lists',
+        theme: appTheme(),
+        initialRoute: 'Login',
+        routes: routes,
+      );
+    }
+    return MultiProvider(
+        providers: [
+          // Get UserData to be able to use it elsewhere in the app
+          StreamProvider<UserData>.value(
+              initialData: UserData.initialData(),
+              value: DatabaseService(uid: authUser.uid).userData),
+          // StreamProvider<DocumentData>.value(
+          //   initialData: DocumentData.initialData(),
+          //   value: DatabaseService().documentData,
+          // ),
+        ],
+        child: MaterialApp(
+          title: 'My Lists',
+          theme: appTheme(),
+          initialRoute: '/',
+          routes: routes,
+        ));
   }
 }
 
 // TODO: bottom menu
 // TODO: amend lists or note after creation
-
 // TODO: work out security on DB????
-// TODO: refactor getUserDetails

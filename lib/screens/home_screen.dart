@@ -8,8 +8,11 @@ import 'package:my_lists/screens/login_screen.dart';
 import 'package:my_lists/screens/user_registration_screen.dart';
 import 'package:my_lists/components/docs_list.dart';
 import 'package:my_lists/components/new_text.dart';
+import 'package:my_lists/models/models.dart';
+import 'package:provider/provider.dart';
 
 final db = FirebaseFirestore.instance;
+final _auth = FirebaseAuth.instance;
 String docType = 'list';
 
 class HomeScreen extends StatefulWidget {
@@ -20,48 +23,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late User loggedInUser;
-  String loggedInUserName = '';
-  bool currentUserIsAdmin = false;
-  String loggedInUserFamily = '';
-
-  final _auth = FirebaseAuth.instance;
-
   @override
   void initState() {
-    getCurrentUserDetails();
     super.initState();
-  }
-
-  void getCurrentUserDetails() {
-    final currentUser = _auth.currentUser;
-    if (currentUser != null) {
-      loggedInUser = currentUser;
-
-      // Get the whole user doc and then process the snapshot to get to the fields
-      Future<String> getDetails() async {
-        DocumentReference userRef =
-            db.collection('users').doc(loggedInUser.uid);
-        String firstName = '';
-        String family = '';
-        await userRef.get().then((snapshot) {
-          firstName = snapshot['firstName'];
-          family = snapshot['family'];
-          currentUserIsAdmin = snapshot['isAdmin'];
-        });
-        setState(() {
-          loggedInUserName = firstName;
-          loggedInUserFamily = family;
-        });
-        return firstName;
-      }
-
-      getDetails();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserData>(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -121,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              if (currentUserIsAdmin)
+              if (user.isAdmin == true)
                 ListTile(
                   title: Text(
                     'Register New User',
@@ -129,10 +98,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   onTap: () {
                     Navigator.pushNamed(context, UserRegistrationScreen.id,
-                        arguments: {'currentUserFamily': loggedInUserFamily});
+                        arguments: {'currentUserFamily': user.family});
                   },
                 ),
-              if (currentUserIsAdmin)
+              if (user.isAdmin == true)
                 ListTile(
                   title: Text(
                     'Edit Users',
@@ -239,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Welcome, $loggedInUserName!',
+                  'Welcome, ${user.firstName}!',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 30.0),
                 ),
@@ -250,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.only(right: 10.0, left: 10.0),
               child: Text(
-                'Here\'s the latest for the $loggedInUserFamily family',
+                'Here\'s the latest for the ${user.family} family',
                 style: TextStyle(fontSize: 25.0),
                 textAlign: TextAlign.center,
               ),
