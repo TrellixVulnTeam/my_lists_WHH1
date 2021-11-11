@@ -34,15 +34,22 @@ class _DocsListState extends State<DocsList> {
     super.dispose();
   }
 
+  // Get the stream here to make it async
+  Stream<QuerySnapshot> familyDocsStream(String? userFamily) async* {
+    yield* db
+        .collection('families')
+        .doc(userFamily)
+        .collection('docs')
+        .orderBy('created at', descending: true)
+        .snapshots();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
 
-    CollectionReference docs =
-        db.collection('families').doc(user.family).collection('docs');
-
     return StreamBuilder<QuerySnapshot>(
-        stream: docs.orderBy('created at', descending: true).snapshots(),
+        stream: familyDocsStream(user.family),
         builder: (homeScreenState, snapshot) {
           if (!snapshot.hasData) {
             return Text('No data');
@@ -174,8 +181,8 @@ class _DocsListState extends State<DocsList> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ListDetailsScreen(
-                                listTitle: document['title'],
                                 listBody: listBody,
+                                listTitle: listTitle,
                                 listID: listID,
                               ),
                             ),

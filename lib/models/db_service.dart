@@ -28,35 +28,22 @@ class DatabaseService {
         .map(_userDataFromSnapshot);
   }
 
-  // DocumentData _documentDataFromSnapshot(QuerySnapshot snapshot) {
-  //   var body;
-  //   var title;
-  //   var isPrivate;
-  //   var docID;
-  //   var type;
-  //   snapshot.docs.forEach((DocumentSnapshot document) {
-  //     body = document['body'];
-  //     title = document['title'];
-  //     isPrivate = document['isPrivate'];
-  //     docID = document.id;
-  //     type = document['type'];
-  //   });
-  //   return DocumentData(
-  //     docBody: body,
-  //     docID: docID,
-  //     type: type,
-  //     isPrivate: isPrivate,
-  //     docTitle: title,
+  // ListData _listDataFromSnapshot(DocumentSnapshot snapshot) {
+  //   return ListData(
+  //     listID: snapshot.id,
+  //     listBody: snapshot['body'],
+  //     listTitle: snapshot['title'],
   //   );
   // }
   //
-  // // Get documents stream from Firestore
-  // Stream<DocumentData> get documentData {
+  // // Get user stream from Firestore
+  // Stream<ListData> get listData {
   //   return _db
   //       .collection('families')
-  //       .doc('Smed')
+  //       .doc(uid)
   //       .collection('docs')
+  //       .doc(listID)
   //       .snapshots()
-  //       .map(_documentDataFromSnapshot);
+  //       .map(_listDataFromSnapshot);
   // }
 }

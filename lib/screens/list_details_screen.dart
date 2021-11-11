@@ -82,5 +82,46 @@ void toggleDone(
       .doc(userFamily)
       .collection('docs')
       .doc(listID)
-      .update({'body.$itemName': isDone}).then((_) {});
+      .update({'body.$itemName': isDone})
+      .then((value) => print("data updated for item $itemName in list $listID"))
+      .catchError((error) => print("Failed to update : $error"));
 }
+
+// Future<void> toggleDone(
+//   String listID,
+//   String? userFamily,
+//   String itemName,
+//   bool isDone,
+// ) async {
+//   CollectionReference docs =
+//       db.collection('families').doc(userFamily).collection('docs');
+//
+//   docs.get().then(
+//         (QuerySnapshot snapshot) => {
+//           snapshot.docs.forEach((d) {
+//             var dID = d.reference;
+//             print('List ID found: $listID');
+//             //new
+//             FirebaseFirestore.instance
+//                 .runTransaction((transaction) async {
+//                   // Get the document
+//                   DocumentSnapshot snapshot = await transaction.get(dID);
+//                   if (!snapshot.exists) {
+//                     throw Exception("User does not exist!");
+//                   }
+//                   bool temp = false;
+//                   print('it was $temp');
+//                   temp = !temp;
+//                   print('now its $temp');
+//                   transaction.update(dID, {'body.$itemName': isDone = temp});
+//
+//                   // Return the new count
+//                   //return temp;
+//                 })
+//                 .then((value) => print("data updated"))
+//                 .catchError((error) => print("Failed to update : $error"));
+//             //new done
+//           }),
+//         },
+//       );
+// }

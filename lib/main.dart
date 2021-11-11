@@ -29,14 +29,13 @@ class MyApp extends StatelessWidget {
     }
     return MultiProvider(
         providers: [
-          // Get UserData to be able to use it elsewhere in the app
+          // Get UserData to be able to use it everywhere
           StreamProvider<UserData>.value(
               initialData: UserData.initialData(),
               value: DatabaseService(uid: authUser.uid).userData),
-          // StreamProvider<DocumentData>.value(
-          //   initialData: DocumentData.initialData(),
-          //   value: DatabaseService().documentData,
-          // ),
+          // StreamProvider<ListData>.value(
+          //     initialData: ListData.initialData(),
+          //     value: DatabaseService(uid: authUser.uid).listData),
         ],
         child: MaterialApp(
           title: 'My Lists',

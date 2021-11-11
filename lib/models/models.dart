@@ -18,23 +18,18 @@ class UserData {
   }
 }
 
-// class DocumentData {
-//   late final docBody;
-//   final String? docTitle;
-//   final String? docID;
-//   final String? type;
-//   final bool? isPrivate;
+// class ListData {
+//   final String? listID;
+//   final String? listTitle;
+//   final String? listBody;
 //
-//   DocumentData(
-//       {this.docBody, this.docTitle, this.docID, this.type, this.isPrivate});
+//   ListData({this.listID, this.listBody, this.listTitle});
 //
-//   factory DocumentData.initialData() {
-//     return DocumentData(
-//       docID: '',
-//       docTitle: '',
-//       isPrivate: false,
-//       type: '',
-//       docBody: '',
+//   factory ListData.initialData() {
+//     return ListData(
+//       listID: '',
+//       listBody: '',
+//       listTitle: '',
 //     );
 //   }
 // }
