@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_lists/components/new_list.dart';
 import 'dart:async';
 import 'package:my_lists/models/models.dart';
 
@@ -6,8 +7,9 @@ class DatabaseService {
   final _db = FirebaseFirestore.instance;
   final uid;
   final listID;
+  final userFamily;
 
-  DatabaseService({this.uid, this.listID});
+  DatabaseService({this.uid, this.listID, this.userFamily});
 
   // User data details to be available to all widgets
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
@@ -28,22 +30,19 @@ class DatabaseService {
         .map(_userDataFromSnapshot);
   }
 
-  // ListData _listDataFromSnapshot(DocumentSnapshot snapshot) {
-  //   return ListData(
-  //     listID: snapshot.id,
-  //     listBody: snapshot['body'],
-  //     listTitle: snapshot['title'],
-  //   );
-  // }
-  //
-  // // Get user stream from Firestore
-  // Stream<ListData> get listData {
-  //   return _db
-  //       .collection('families')
-  //       .doc(uid)
-  //       .collection('docs')
-  //       .doc(listID)
-  //       .snapshots()
-  //       .map(_listDataFromSnapshot);
-  // }
+  ListData _listDataFromSnapshot(DocumentSnapshot snapshot) {
+    return ListData(
+        listID: uid, listTitle: snapshot['email'], listBody: snapshot['body']);
+  }
+
+  // Get user stream from Firestore
+  Stream<UserData> get listData {
+    return _db
+        .collection('families')
+        .doc(userFamily)
+        .collection('docs')
+        .doc(listID)
+        .snapshots()
+        .map(_userDataFromSnapshot);
+  }
 }

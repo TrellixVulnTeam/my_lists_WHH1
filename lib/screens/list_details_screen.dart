@@ -1,39 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:my_lists/components/docs_list.dart';
+import 'package:my_lists/components/new_list.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/item_tile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_lists/models/item.dart';
 import 'package:provider/provider.dart';
 import 'package:my_lists/models/models.dart';
+import 'package:my_lists/models/db_service.dart';
 
 final db = FirebaseFirestore.instance;
+late final isDone;
+late final name;
+List listBot = [];
 
 class ListDetailsScreen extends StatefulWidget {
-  final listTitle;
-  final List listBody;
   final listID;
 
-  ListDetailsScreen({this.listTitle, required this.listBody, this.listID});
+  ListDetailsScreen({this.listID});
 
   @override
   _ListDetailsScreenState createState() => _ListDetailsScreenState();
 }
 
+List<SingleItem> getListItems() {
+  List<SingleItem> items = [];
+
+  DocumentReference listRef =
+      db.collection('families').doc(userFamily).collection('docs').doc(listID);
+
+  listRef.get().then((document) {
+    Map data = (document.data() as Map);
+    data.forEach((key, value) {
+      print('adding entry');
+      items.add(SingleItem(
+        isDone: value['isDone'],
+        name: value['name'],
+      ));
+    });
+  });
+
+  return items;
+}
+
 class _ListDetailsScreenState extends State<ListDetailsScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    listBody.clear();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
+    var items = getListItems();
     return Scaffold(
       appBar: AppBar(
         title: Text('My Lists'),
@@ -44,7 +58,7 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 15.0),
             child: Text(
-              listTitle,
+              'Booya',
               style: TextStyle(fontSize: 25.0),
             ),
           ),
@@ -52,18 +66,17 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
             padding: const EdgeInsets.all(15.0),
             child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: listBody.length,
+                itemCount: items.length,
                 itemBuilder: (context, int index) {
                   return ItemTile(
-                      isDone: listBody[index].isDone,
-                      name: listBody[index].name,
+                      isDone: items[index].isDone,
+                      name: items[index].name,
                       onTapped: () {
                         setState(() {
                           toggleDone(
-                              listBody[index].name,
+                              items[index].name,
                               listID,
-                              (listBody[index].isDone =
-                                  !listBody[index].isDone),
+                              (items[index].isDone = !items[index].isDone),
                               user.family);
                         });
                       });

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_lists/constants.dart';
 
 class ItemTile extends StatelessWidget {
   final bool isDone;
@@ -14,6 +15,7 @@ class ItemTile extends StatelessWidget {
       title: Text(
         name,
         style: TextStyle(
+          color: kPrimaryTextColour,
           decoration: isDone ? TextDecoration.lineThrough : null,
         ),
       ),

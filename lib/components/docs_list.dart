@@ -169,22 +169,18 @@ class _DocsListState extends State<DocsList> {
                       ),
                       onTap: () {
                         if (document['type'] == 'list') {
-                          listBody = document['body']
-                              .entries
-                              .map((e) =>
-                                  SingleItem(name: e.key, isDone: e.value))
-                              .toList();
-                          listTitle = document['title'];
+                          // listBody = document['body']
+                          //     .entries
+                          //     .map((e) =>
+                          //         SingleItem(name: e.key, isDone: e.value))
+                          //     .toList();
+                          // listTitle = document['title'];
                           listID = document.id;
 
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ListDetailsScreen(
-                                listBody: listBody,
-                                listTitle: listTitle,
-                                listID: listID,
-                              ),
+                              builder: (context) => ListDetailsScreen(),
                             ),
                           );
                         } else if (document['type'] == 'note') {

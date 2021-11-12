@@ -18,18 +18,18 @@ class UserData {
   }
 }
 
-// class ListData {
-//   final String? listID;
-//   final String? listTitle;
-//   final String? listBody;
-//
-//   ListData({this.listID, this.listBody, this.listTitle});
-//
-//   factory ListData.initialData() {
-//     return ListData(
-//       listID: '',
-//       listBody: '',
-//       listTitle: '',
-//     );
-//   }
-// }
+class ListData {
+  final String? listID;
+  final String? listTitle;
+  final String? listBody;
+
+  ListData({this.listID, this.listBody, this.listTitle});
+
+  factory ListData.initialData() {
+    return ListData(
+      listID: '',
+      listBody: '',
+      listTitle: '',
+    );
+  }
+}
