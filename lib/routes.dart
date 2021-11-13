@@ -13,4 +13,5 @@ final Map<String, WidgetBuilder> routes = <String, WidgetBuilder>{
   LoginScreen.id: (context) => LoginScreen(),
   UserRegistrationScreen.id: (context) => UserRegistrationScreen(),
   FamilyRegistrationScreen.id: (context) => FamilyRegistrationScreen(),
+  //TestListDetailsScreen.id: (context) => TestListDetailsScreen(),
 };

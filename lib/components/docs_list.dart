@@ -180,7 +180,9 @@ class _DocsListState extends State<DocsList> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ListDetailsScreen(),
+                              builder: (context) => ListDetailsScreen(
+                                listID: listID,
+                              ),
                             ),
                           );
                         } else if (document['type'] == 'note') {

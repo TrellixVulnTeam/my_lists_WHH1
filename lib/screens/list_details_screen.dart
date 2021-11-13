@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/components/docs_list.dart';
 import 'package:my_lists/components/new_list.dart';
@@ -23,67 +24,97 @@ class ListDetailsScreen extends StatefulWidget {
   _ListDetailsScreenState createState() => _ListDetailsScreenState();
 }
 
-List<SingleItem> getListItems() {
-  List<SingleItem> items = [];
-
-  DocumentReference listRef =
-      db.collection('families').doc(userFamily).collection('docs').doc(listID);
-
-  listRef.get().then((document) {
-    Map data = (document.data() as Map);
-    data.forEach((key, value) {
-      print('adding entry');
-      items.add(SingleItem(
-        isDone: value['isDone'],
-        name: value['name'],
-      ));
-    });
-  });
-
-  return items;
-}
-
 class _ListDetailsScreenState extends State<ListDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
-    var items = getListItems();
+    final db = FirebaseFirestore.instance;
     return Scaffold(
       appBar: AppBar(
         title: Text('My Lists'),
         backgroundColor: kLightAccentColour,
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 15.0),
-            child: Text(
-              'Booya',
-              style: TextStyle(fontSize: 25.0),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: items.length,
-                itemBuilder: (context, int index) {
-                  return ItemTile(
-                      isDone: items[index].isDone,
-                      name: items[index].name,
-                      onTapped: () {
-                        setState(() {
-                          toggleDone(
-                              items[index].name,
-                              listID,
-                              (items[index].isDone = !items[index].isDone),
-                              user.family);
-                        });
-                      });
-                }),
-          )
-        ],
-      ),
+      body: StreamBuilder<DocumentSnapshot>(
+          stream: db
+              .collection('families')
+              .doc(user.family)
+              .collection('docs')
+              .doc(listID)
+              .snapshots(),
+          builder: (context, AsyncSnapshot snapshot) {
+            // print(snapshot.data['body'].toString());
+            print(snapshot.data['body']);
+            if (snapshot.hasData) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: Text(
+                      snapshot.data['title'].toString(),
+                      style: TextStyle(fontSize: 25.0),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(''),
+                    // child: ListView.builder(
+                    //     shrinkWrap: true,
+                    //     itemCount: snapshot.data['body'].length,
+                    //     itemBuilder: (context, int index) {
+                    //       return ItemTile(
+                    //           isDone: snapshot.data['body'][index].isDone,
+                    //           name: listBot[index].name,
+                    //           onTapped: () {
+                    //             setState(() {
+                    //               toggleDone(
+                    //                   listBot[index].name,
+                    //                   listID,
+                    //                   (listBot[index].isDone =
+                    //                       !listBot[index].isDone),
+                    //                   user.family);
+                    //             });
+                    //           });
+                    //     }),
+                  )
+                ],
+              );
+            } else
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+          }),
+      // body: Column(
+      //   children: [
+      //     Padding(
+      //       padding: const EdgeInsets.only(top: 15.0),
+      //       child: Text(
+      //         listTitle,
+      //         style: TextStyle(fontSize: 25.0),
+      //       ),
+      //     ),
+      //     Padding(
+      //       padding: const EdgeInsets.all(15.0),
+      //       child: ListView.builder(
+      //           shrinkWrap: true,
+      //           itemCount: listBody.length,
+      //           itemBuilder: (context, int index) {
+      //             return ItemTile(
+      //                 isDone: listBody[index].isDone,
+      //                 name: listBody[index].name,
+      //                 onTapped: () {
+      //                   setState(() {
+      //                     toggleDone(
+      //                         listBody[index].name,
+      //                         listID,
+      //                         (listBody[index].isDone =
+      //                             !listBody[index].isDone),
+      //                         user.family);
+      //                   });
+      //                 });
+      //           }),
+      //     )
+      //   ],
+      // ),
     );
   }
 }
