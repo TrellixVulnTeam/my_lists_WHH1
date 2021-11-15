@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/new_list.dart';
+import 'package:my_lists/models/db_service.dart';
 import 'package:my_lists/screens/login_screen.dart';
 import 'package:my_lists/screens/user_registration_screen.dart';
 import 'package:my_lists/components/docs_list.dart';
@@ -13,6 +14,7 @@ import 'package:provider/provider.dart';
 
 final db = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
+final authUser = FirebaseAuth.instance.currentUser;
 String docType = 'list';
 
 class HomeScreen extends StatefulWidget {
@@ -24,13 +26,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
+    final user = Provider.of<User?>(context);
+    return MultiProvider(
+      providers: [
+        StreamProvider<UserData>.value(
+            value: DatabaseService(uid: user!.uid).userData,
+            initialData: UserData.initialData()),
+      ],
+      child: AfterLogin(user: user),
+    );
   }
+}
+
+class AfterLogin extends StatelessWidget {
+  AfterLogin({required this.user});
+  final User? user;
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserData>(context);
+    final userData = Provider.of<UserData>(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -90,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              if (user.isAdmin == true)
+              if (userData.isAdmin == true)
                 ListTile(
                   title: Text(
                     'Register New User',
@@ -98,10 +113,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   onTap: () {
                     Navigator.pushNamed(context, UserRegistrationScreen.id,
-                        arguments: {'currentUserFamily': user.family});
+                        arguments: {'currentUserFamily': userData.family});
                   },
                 ),
-              if (user.isAdmin == true)
+              if (userData.isAdmin == true)
                 ListTile(
                   title: Text(
                     'Edit Users',
@@ -208,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Welcome, ${user.firstName}!',
+                  'Welcome, ${userData.firstName}!',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 30.0),
                 ),
@@ -219,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.only(right: 10.0, left: 10.0),
               child: Text(
-                'Here\'s the latest for the ${user.family} family',
+                'Here\'s the latest for the ${userData.family} family',
                 style: TextStyle(fontSize: 25.0),
                 textAlign: TextAlign.center,
               ),

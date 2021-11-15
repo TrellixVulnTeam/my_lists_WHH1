@@ -24,7 +24,7 @@ class ListDetailsScreen extends StatefulWidget {
 class _ListDetailsScreenState extends State<ListDetailsScreen> {
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserData>(context);
+    final userData = Provider.of<UserData>(context);
     final db = FirebaseFirestore.instance;
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +34,7 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
       body: StreamBuilder<DocumentSnapshot>(
           stream: db
               .collection('families')
-              .doc(user.family)
+              .doc(userData.family)
               .collection('docs')
               .doc(listID)
               .snapshots(),
@@ -69,7 +69,7 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                                     listID,
                                     (listOfItems[index].isDone =
                                         !listOfItems[index].isDone),
-                                    user.family);
+                                    userData.family);
                               });
                             },
                           );

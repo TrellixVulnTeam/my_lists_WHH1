@@ -46,10 +46,10 @@ class _DocsListState extends State<DocsList> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserData>(context);
+    final userData = Provider.of<UserData>(context);
 
     return StreamBuilder<QuerySnapshot>(
-        stream: familyDocsStream(user.family),
+        stream: familyDocsStream(userData.family),
         builder: (homeScreenState, snapshot) {
           if (!snapshot.hasData) {
             return Text('No data');
@@ -68,7 +68,7 @@ class _DocsListState extends State<DocsList> {
               crossAxisSpacing: 2.0,
               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                 if (document['isPrivate'] == true &&
-                    document['created by'] != user.email) {
+                    document['created by'] != userData.email) {
                   isVisible = false;
                 } else
                   isVisible = true;
@@ -114,7 +114,7 @@ class _DocsListState extends State<DocsList> {
                                           color: kPrimaryTextColour),
                                     ),
                                     onPressed: () {
-                                      deleteDoc(document.id, user.family);
+                                      deleteDoc(document.id, userData.family);
                                       Navigator.pop(context);
                                     },
                                   ),
