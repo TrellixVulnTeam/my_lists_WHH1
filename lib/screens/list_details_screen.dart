@@ -31,6 +31,13 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
         title: Text('My Lists'),
         backgroundColor: kLightAccentColour,
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        foregroundColor: kPrimaryTextColour,
+        backgroundColor: kAccentColour,
+        onPressed: () {},
+      ),
       body: StreamBuilder<DocumentSnapshot>(
           stream: db
               .collection('families')
@@ -46,6 +53,7 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                   .toList();
               return Column(
                 children: [
+                  SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.only(top: 15.0),
                     child: Text(
@@ -53,27 +61,73 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                       style: TextStyle(fontSize: 25.0),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: listOfItems.length,
-                        itemBuilder: (context, int index) {
-                          return ItemTile(
-                            isDone: listOfItems[index].isDone,
-                            name: listOfItems[index].name,
-                            onTapped: () {
-                              setState(() {
-                                toggleDone(
-                                    listOfItems[index].name,
-                                    listID,
-                                    (listOfItems[index].isDone =
-                                        !listOfItems[index].isDone),
-                                    userData.family);
-                              });
-                            },
-                          );
-                        }),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 15.0, right: 15.0, top: 15.0, bottom: 120.0),
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: listOfItems.length,
+                          itemBuilder: (context, int index) {
+                            return InkWell(
+                              onLongPress: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text('Delete Item?'),
+                                        backgroundColor:
+                                            kSuperLightAccentColour,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(32.0)),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () {
+                                                deleteItem(
+                                                    listOfItems[index].name,
+                                                    listID,
+                                                    userData.family);
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                'OK',
+                                                style: TextStyle(
+                                                    fontSize: 20.0,
+                                                    color: kPrimaryTextColour),
+                                              )),
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                'Cancel',
+                                                style: TextStyle(
+                                                    fontSize: 20.0,
+                                                    color: kPrimaryTextColour),
+                                              ))
+                                        ],
+                                      );
+                                    });
+                              },
+                              child: ItemTile(
+                                isDone: listOfItems[index].isDone,
+                                name: listOfItems[index].name,
+                                onTapped: () {
+                                  setState(() {
+                                    toggleDone(
+                                        listOfItems[index].name,
+                                        listID,
+                                        (listOfItems[index].isDone =
+                                            !listOfItems[index].isDone),
+                                        userData.family);
+                                  });
+                                },
+                              ),
+                            );
+                          }),
+                    ),
                   )
                 ],
               );
@@ -96,4 +150,13 @@ void toggleDone(
       .update({'body.$itemName': isDone})
       .then((value) => print("data updated for item $itemName in list $listID"))
       .catchError((error) => print("Failed to update : $error"));
+}
+
+void deleteItem(String itemName, String listID, String? userFamily) {
+  FirebaseFirestore.instance
+      .collection('families')
+      .doc(userFamily)
+      .collection('docs')
+      .doc(listID)
+      .update({'body.$itemName': FieldValue.delete()});
 }

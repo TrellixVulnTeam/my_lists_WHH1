@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/new_list.dart';
-import 'package:my_lists/models/db_service.dart';
 import 'package:my_lists/screens/login_screen.dart';
 import 'package:my_lists/screens/user_registration_screen.dart';
 import 'package:my_lists/components/docs_list.dart';
@@ -26,18 +25,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
-  Widget build(BuildContext context) {
-    final user = Provider.of<User?>(context);
-    if (user != null) {
-      return AfterLogin(user: user);
-    } else
-      return LoginScreen();
+  void initState() {
+    super.initState();
   }
-}
-
-class AfterLogin extends StatelessWidget {
-  AfterLogin({required this.user});
-  final User? user;
 
   @override
   Widget build(BuildContext context) {
