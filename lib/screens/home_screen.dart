@@ -28,14 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User?>(context);
-    return MultiProvider(
-      providers: [
-        StreamProvider<UserData>.value(
-            value: DatabaseService(uid: user!.uid).userData,
-            initialData: UserData.initialData()),
-      ],
-      child: AfterLogin(user: user),
-    );
+    if (user != null) {
+      return AfterLogin(user: user);
+    } else
+      return LoginScreen();
   }
 }
 
