@@ -58,7 +58,7 @@ class _NewListState extends State<NewList> {
           child: Card(
             color: kLightAccentColour,
             child: Column(
-              //mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0, top: 15.0),

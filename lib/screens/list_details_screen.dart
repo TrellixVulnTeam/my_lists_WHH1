@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/components/docs_list.dart';
+import 'package:my_lists/components/list_field.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/item_tile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,8 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:my_lists/models/models.dart';
 
 final db = FirebaseFirestore.instance;
-late final isDone;
-late final name;
+late String itemName;
+TextEditingController controller = TextEditingController();
 
 class ListDetailsScreen extends StatefulWidget {
   final listID;
@@ -36,7 +37,43 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
         child: Icon(Icons.add),
         foregroundColor: kPrimaryTextColour,
         backgroundColor: kAccentColour,
-        onPressed: () {},
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return Padding(
+                  padding: const EdgeInsets.all(25.0),
+                  child: AlertDialog(
+                    title: Text('Add Item'),
+                    backgroundColor: kSuperLightAccentColour,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                    ),
+                    content: ListField(controller: controller),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          itemName = controller.text;
+                          addItem(itemName, listID, userData.family);
+                          controller.clear();
+                          itemName = '';
+                          Navigator.pop(context);
+                        },
+                        child: Text('Add Item'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          controller.clear();
+                          itemName = '';
+                          Navigator.pop(context);
+                        },
+                        child: Text('Cancel'),
+                      ),
+                    ],
+                  ),
+                );
+              });
+        },
       ),
       body: StreamBuilder<DocumentSnapshot>(
           stream: db
@@ -159,4 +196,13 @@ void deleteItem(String itemName, String listID, String? userFamily) {
       .collection('docs')
       .doc(listID)
       .update({'body.$itemName': FieldValue.delete()});
+}
+
+void addItem(String itemName, String listID, String? userFamily) {
+  FirebaseFirestore.instance
+      .collection('families')
+      .doc(userFamily)
+      .collection('docs')
+      .doc(listID)
+      .update({'body.$itemName': false});
 }

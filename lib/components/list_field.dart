@@ -3,9 +3,9 @@ import 'package:my_lists/constants.dart';
 
 class ListField extends StatelessWidget {
   final controller;
-  final FocusNode lineFocus;
+  final FocusNode? lineFocus;
 
-  ListField({this.controller, required this.lineFocus});
+  ListField({this.controller, this.lineFocus});
 
   @override
   Widget build(BuildContext context) {

@@ -89,5 +89,4 @@ class AuthorizedProviderLayer extends StatelessWidget {
 }
 
 // TODO: bottom menu
-// TODO: amend lists or note after creation
 // TODO: work out security on DB????
