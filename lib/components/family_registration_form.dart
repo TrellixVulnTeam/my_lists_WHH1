@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/custom_button.dart';
@@ -24,6 +25,8 @@ class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
 
   bool showSpinner = false;
 
+  final _auth = FirebaseAuth.instance;
+
   // define callable function
   HttpsCallable createUserCallable = FirebaseFunctions.instance.httpsCallable(
       'createUser',
@@ -41,11 +44,14 @@ class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
 
     String uid = "0";
     await createUserCallable(data)
-        .then((response) => {
+        .then((response) async => {
               if (response.data['status'] == 'success')
                 {
                   isSuccessful = true,
                   showAlertDialog(context, 'Family Created Successfully!'),
+                  // Need the signIn event in order to get the Providers in main.dart working
+                  await _auth.signInWithEmailAndPassword(
+                      email: _email, password: _password),
                 }
               else
                 {
