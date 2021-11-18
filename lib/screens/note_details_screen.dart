@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:my_lists/components/docs_list.dart';
+import 'package:my_lists/components/center_text.dart';
 import 'package:my_lists/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 final db = FirebaseFirestore.instance;
-final _auth = FirebaseAuth.instance;
 late User loggedInUser;
 
 class NoteDetailsScreen extends StatefulWidget {
@@ -34,20 +33,36 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         title: Text('My Lists'),
         backgroundColor: kLightAccentColour,
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 15.0),
-            child: Text(
-              widget.noteTitle,
-              style: TextStyle(fontSize: 25.0),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.edit),
+        foregroundColor: kPrimaryTextColour,
+        backgroundColor: kAccentColour,
+        onPressed: () {},
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.only(top: 15.0),
+              child: CenterHorizontal(
+                Text(
+                  widget.noteTitle,
+                  style: TextStyle(fontSize: 25.0),
+                ),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Text(widget.noteBody),
-          )
-        ],
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                widget.noteBody,
+                style: TextStyle(fontSize: 18.0),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -215,8 +215,8 @@ void createList(title) {
         .set({
           'title': title,
           'body': mapItems,
-          'created at': FieldValue.serverTimestamp(),
-          'created by': userEmail,
+          'created_at': FieldValue.serverTimestamp(),
+          'created_by': userEmail,
           'type': 'list',
           'isPrivate': isPrivate,
           'id': tempNewDoc.id,

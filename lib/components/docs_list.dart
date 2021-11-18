@@ -40,7 +40,7 @@ class _DocsListState extends State<DocsList> {
         .collection('families')
         .doc(userFamily)
         .collection('docs')
-        .orderBy('created at', descending: true)
+        .orderBy('created_at', descending: true)
         .snapshots();
   }
 
@@ -68,7 +68,7 @@ class _DocsListState extends State<DocsList> {
               crossAxisSpacing: 2.0,
               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                 if (document['isPrivate'] == true &&
-                    document['created by'] != userData.email) {
+                    document['created_by'] != userData.email) {
                   isVisible = false;
                 } else
                   isVisible = true;
@@ -169,12 +169,6 @@ class _DocsListState extends State<DocsList> {
                       ),
                       onTap: () {
                         if (document['type'] == 'list') {
-                          // listBody = document['body']
-                          //     .entries
-                          //     .map((e) =>
-                          //         SingleItem(name: e.key, isDone: e.value))
-                          //     .toList();
-                          // listTitle = document['title'];
                           listID = document.id;
 
                           Navigator.push(

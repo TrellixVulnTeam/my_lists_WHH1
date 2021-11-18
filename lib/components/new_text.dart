@@ -143,8 +143,8 @@ class _NewTextState extends State<NewText> {
           .set({
             'title': title,
             'body': text,
-            'created at': FieldValue.serverTimestamp(),
-            'created by': userEmail,
+            'created_at': FieldValue.serverTimestamp(),
+            'created_by': userEmail,
             'type': 'note',
             'isPrivate': isPrivate,
             'id': tempNewDoc.id,

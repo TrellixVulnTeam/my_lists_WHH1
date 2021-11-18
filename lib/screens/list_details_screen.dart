@@ -59,7 +59,11 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                           itemName = '';
                           Navigator.pop(context);
                         },
-                        child: Text('Add Item'),
+                        child: Text(
+                          'Add Item',
+                          style: TextStyle(
+                              fontSize: 20, color: kPrimaryTextColour),
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
@@ -67,7 +71,11 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                           itemName = '';
                           Navigator.pop(context);
                         },
-                        child: Text('Cancel'),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                              fontSize: 20, color: kPrimaryTextColour),
+                        ),
                       ),
                     ],
                   ),

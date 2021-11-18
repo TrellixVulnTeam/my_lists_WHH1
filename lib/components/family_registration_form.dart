@@ -174,34 +174,26 @@ class _FamilyRegistrationFormState extends State<FamilyRegistrationForm> {
 }
 
 showAlertDialog(BuildContext context, String message) {
-  // set up the button
-  Widget okButton = TextButton(
-    child: Text('OK'),
-    onPressed: () {
-      isSuccessful == true
-          ? Navigator.popAndPushNamed(context, HomeScreen.id)
-          : Navigator.pop(context);
-    },
-  );
-
-  // set up the AlertDialog
-  AlertDialog alert = AlertDialog(
-    title:
-        Text(isSuccessful == true ? 'User Created' : 'Unable to Create User'),
-    content: Text(
-      message,
-      style: TextStyle(color: kSecondaryTextColour),
-    ),
-    actions: [
-      okButton,
-    ],
-  );
-
-  // show the dialog
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return alert;
+      return AlertDialog(
+        title: Text(isSuccessful == true ? message : 'Unable to Create Family'),
+        content: Text(
+          message,
+          style: TextStyle(color: kSecondaryTextColour),
+        ),
+        actions: [
+          TextButton(
+            child: Text('OK'),
+            onPressed: () async {
+              isSuccessful == true
+                  ? Navigator.popAndPushNamed(context, HomeScreen.id)
+                  : Navigator.pop(context);
+            },
+          ),
+        ],
+      );
     },
   );
 }
@@ -213,7 +205,7 @@ void addFamily(name) {
     return families
         .set({
           'familyName': name,
-          'created at': FieldValue.serverTimestamp(),
+          'created_at': FieldValue.serverTimestamp(),
         })
         .then((value) => print("Family Added"))
         .catchError((error) => print("Failed to add family: $error"));

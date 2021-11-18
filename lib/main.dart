@@ -6,7 +6,6 @@ import 'package:my_lists/theme/style.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'models/db_service.dart';
 import 'models/models.dart';
 
