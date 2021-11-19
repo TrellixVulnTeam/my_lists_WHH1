@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:my_lists/components/family_registration_form.dart';
 import 'package:my_lists/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:my_lists/components/user_registration_form.dart';
 
 final db = FirebaseFirestore.instance;
 

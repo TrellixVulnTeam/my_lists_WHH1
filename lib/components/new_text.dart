@@ -20,7 +20,6 @@ class NewText extends StatefulWidget {
 }
 
 class _NewTextState extends State<NewText> {
-  //final _auth = FirebaseAuth.instance;
   TextEditingController _textEditingController = TextEditingController();
 
   @override
