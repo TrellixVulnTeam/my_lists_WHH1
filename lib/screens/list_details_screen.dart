@@ -109,7 +109,7 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(
-                          left: 15.0, right: 15.0, top: 15.0, bottom: 120.0),
+                          left: 20.0, right: 20.0, top: 15.0, bottom: 100.0),
                       child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: listOfItems.length,

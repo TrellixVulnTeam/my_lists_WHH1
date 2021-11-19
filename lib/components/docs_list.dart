@@ -187,8 +187,6 @@ class _DocsListState extends State<DocsList> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => NoteDetailsScreen(
-                                noteTitle: document['title'],
-                                noteBody: docText,
                                 noteID: noteID,
                               ),
                             ),
