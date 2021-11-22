@@ -27,160 +27,164 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData>(context);
     final db = FirebaseFirestore.instance;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('My Lists'),
-        backgroundColor: kLightAccentColour,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        foregroundColor: kPrimaryTextColour,
-        backgroundColor: kAccentColour,
-        onPressed: () {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return Padding(
-                  padding: const EdgeInsets.all(25.0),
-                  child: AlertDialog(
-                    title: Text('Add Item'),
-                    backgroundColor: kSuperLightAccentColour,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                    ),
-                    content: ListField(controller: controller),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          itemName = controller.text;
-                          addItem(itemName, listID, userData.family);
-                          controller.clear();
-                          itemName = '';
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                          'Add Item',
-                          style: TextStyle(
-                              fontSize: 20, color: kPrimaryTextColour),
-                        ),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('My Lists'),
+          backgroundColor: kLightAccentColour,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          foregroundColor: kPrimaryTextColour,
+          backgroundColor: kAccentColour,
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: AlertDialog(
+                      title: Text('Add Item'),
+                      backgroundColor: kSuperLightAccentColour,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(32.0)),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          controller.clear();
-                          itemName = '';
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                              fontSize: 20, color: kPrimaryTextColour),
+                      content: ListField(controller: controller),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            itemName = controller.text;
+                            addItem(itemName, listID, userData.family);
+                            controller.clear();
+                            itemName = '';
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'Add Item',
+                            style: TextStyle(
+                                fontSize: 20, color: kPrimaryTextColour),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              });
-        },
-      ),
-      body: StreamBuilder<DocumentSnapshot>(
-          stream: db
-              .collection('families')
-              .doc(userData.family)
-              .collection('docs')
-              .doc(listID)
-              .snapshots(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              // We got map from Firestore, make it into a List again to be able to use it in ListView below
-              List listOfItems = snapshot.data['body'].entries
-                  .map((e) => SingleItem(name: e.key, isDone: e.value))
-                  .toList();
-              return Column(
-                children: [
-                  SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15.0),
-                    child: Text(
-                      snapshot.data['title'].toString(),
-                      style: TextStyle(fontSize: 25.0),
+                        TextButton(
+                          onPressed: () {
+                            controller.clear();
+                            itemName = '';
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                                fontSize: 20, color: kPrimaryTextColour),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20.0, right: 20.0, top: 15.0, bottom: 100.0),
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: listOfItems.length,
-                          itemBuilder: (context, int index) {
-                            return InkWell(
-                              onLongPress: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: Text('Delete Item?'),
-                                        backgroundColor:
-                                            kSuperLightAccentColour,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(32.0)),
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                              onPressed: () {
-                                                deleteItem(
-                                                    listOfItems[index].name,
-                                                    listID,
-                                                    userData.family);
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text(
-                                                'OK',
-                                                style: TextStyle(
-                                                    fontSize: 20.0,
-                                                    color: kPrimaryTextColour),
-                                              )),
-                                          TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text(
-                                                'Cancel',
-                                                style: TextStyle(
-                                                    fontSize: 20.0,
-                                                    color: kPrimaryTextColour),
-                                              ))
-                                        ],
-                                      );
-                                    });
-                              },
-                              child: ItemTile(
-                                isDone: listOfItems[index].isDone,
-                                name: listOfItems[index].name,
-                                onTapped: () {
-                                  setState(() {
-                                    toggleDone(
-                                        listOfItems[index].name,
-                                        listID,
-                                        (listOfItems[index].isDone =
-                                            !listOfItems[index].isDone),
-                                        userData.family);
-                                  });
+                  );
+                });
+          },
+        ),
+        body: StreamBuilder<DocumentSnapshot>(
+            stream: db
+                .collection('families')
+                .doc(userData.family)
+                .collection('docs')
+                .doc(listID)
+                .snapshots(),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                // We got map from Firestore, make it into a List again to be able to use it in ListView below
+                List listOfItems = snapshot.data['body'].entries
+                    .map((e) => SingleItem(name: e.key, isDone: e.value))
+                    .toList();
+                return Column(
+                  children: [
+                    SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15.0),
+                      child: Text(
+                        snapshot.data['title'].toString(),
+                        style: TextStyle(fontSize: 25.0),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20.0, right: 20.0, top: 15.0, bottom: 100.0),
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: listOfItems.length,
+                            itemBuilder: (context, int index) {
+                              return InkWell(
+                                onLongPress: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text('Delete Item?'),
+                                          backgroundColor:
+                                              kSuperLightAccentColour,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(32.0)),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  deleteItem(
+                                                      listOfItems[index].name,
+                                                      listID,
+                                                      userData.family);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  'OK',
+                                                  style: TextStyle(
+                                                      fontSize: 20.0,
+                                                      color:
+                                                          kPrimaryTextColour),
+                                                )),
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                      fontSize: 20.0,
+                                                      color:
+                                                          kPrimaryTextColour),
+                                                ))
+                                          ],
+                                        );
+                                      });
                                 },
-                              ),
-                            );
-                          }),
-                    ),
-                  )
-                ],
-              );
-            } else
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-          }),
+                                child: ItemTile(
+                                  isDone: listOfItems[index].isDone,
+                                  name: listOfItems[index].name,
+                                  onTapped: () {
+                                    setState(() {
+                                      toggleDone(
+                                          listOfItems[index].name,
+                                          listID,
+                                          (listOfItems[index].isDone =
+                                              !listOfItems[index].isDone),
+                                          userData.family);
+                                    });
+                                  },
+                                ),
+                              );
+                            }),
+                      ),
+                    )
+                  ],
+                );
+              } else
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+            }),
+      ),
     );
   }
 }

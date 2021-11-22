@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/new_list.dart';
+import 'package:my_lists/screens/edit_users_screen.dart';
 import 'package:my_lists/screens/login_screen.dart';
 import 'package:my_lists/screens/user_registration_screen.dart';
 import 'package:my_lists/components/docs_list.dart';
@@ -37,6 +38,18 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           title: Text('My Lists'),
           backgroundColor: kLightAccentColour,
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.exit_to_app,
+                color: kPrimaryTextColour,
+              ),
+              onPressed: () async {
+                await _auth.signOut();
+                Navigator.pushNamed(context, LoginScreen.id);
+              },
+            ),
+          ],
         ),
         bottomNavigationBar: BottomAppBar(
           color: kSuperLightAccentColour,
@@ -63,64 +76,42 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Padding(
                 padding: EdgeInsets.only(right: 90),
-                child: IconButton(
+                child: PopupMenuButton(
                   icon: Icon(
                     Icons.people,
-                    color: Colors.white,
+                    color: kPrimaryTextColour,
                   ),
-                  onPressed: () {},
-                ),
-              )
-            ],
-          ),
-        ),
-        endDrawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              // DrawerHeader wrapped with Container to change the height
-              Container(
-                height: 100.0,
-                child: DrawerHeader(
-                  child: Text(
-                    'Settings',
-                    style: TextStyle(fontStyle: FontStyle.italic, fontSize: 30),
-                  ),
-                  decoration: BoxDecoration(
-                    color: kPrimaryColour,
-                  ),
-                ),
-              ),
-              if (userData.isAdmin == true)
-                ListTile(
-                  title: Text(
-                    'Register New User',
-                    style: TextStyle(color: kPrimaryTextColour),
-                  ),
-                  onTap: () {
-                    Navigator.pushNamed(context, UserRegistrationScreen.id,
-                        arguments: {'currentUserFamily': userData.family});
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      child: Text('User Settings'),
+                      value: 1,
+                    ),
+                    if (userData.isAdmin == true)
+                      PopupMenuItem(
+                        child: Text('Register New User'),
+                        value: 2,
+                      ),
+                    if (userData.isAdmin == true)
+                      PopupMenuItem(
+                        child: Text('Edit Users'),
+                        value: 3,
+                      ),
+                  ],
+                  onSelected: (value) {
+                    switch (value) {
+                      case 1:
+                        print('You chose settings');
+                        break;
+                      case 2:
+                        Navigator.pushNamed(context, UserRegistrationScreen.id);
+                        break;
+                      case 3:
+                        Navigator.pushNamed(context, EditUsers.id);
+                        break;
+                    }
                   },
                 ),
-              if (userData.isAdmin == true)
-                ListTile(
-                  title: Text(
-                    'Edit Users',
-                    style: TextStyle(color: kPrimaryTextColour),
-                  ),
-                  onTap: () {},
-                ),
-
-              ListTile(
-                title: Text(
-                  'Log Out',
-                  style: TextStyle(color: kPrimaryTextColour),
-                ),
-                onTap: () async {
-                  await _auth.signOut();
-                  Navigator.pushNamed(context, LoginScreen.id);
-                },
-              ),
+              )
             ],
           ),
         ),

@@ -3,8 +3,9 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/custom_button.dart';
+import 'package:my_lists/models/models.dart';
 import 'package:my_lists/screens/home_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 bool isSuccessful = false;
 final db = FirebaseFirestore.instance;
@@ -16,10 +17,6 @@ class UserRegistrationForm extends StatefulWidget {
 
 class _UserRegistrationFormState extends State<UserRegistrationForm> {
   final _userRegistrationFormKey = GlobalKey<FormState>();
-  final _auth = FirebaseAuth.instance;
-  late User loggedInUser;
-  bool currentUserIsAdmin = false;
-  late String _currentUserFamily;
 
   @override
   void dispose() {
@@ -27,40 +24,14 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
   }
 
   void initState() {
-    getCurrentUserFamily();
     super.initState();
-  }
-
-  void getCurrentUserFamily() {
-    final currentUser = _auth.currentUser;
-    if (currentUser != null) {
-      loggedInUser = currentUser;
-
-      // Get the whole user doc and then process the snapshot to get to the fields
-      Future<String> getDetails() async {
-        DocumentReference userRef =
-            db.collection('users').doc(loggedInUser.uid);
-        String family = '';
-        await userRef.get().then((snapshot) {
-          if (snapshot.data() != null) {
-            family = snapshot['family'];
-            currentUserIsAdmin = snapshot['isAdmin'];
-          }
-        });
-        setState(() {
-          _currentUserFamily = family;
-        });
-        return family;
-      }
-
-      getDetails();
-    }
   }
 
   late String _email;
   late String _password;
   late String _firstName;
   bool _isAdmin = false;
+  late String userFamily;
 
   bool showSpinner = false;
 
@@ -76,7 +47,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
       "password": _password,
       "firstName": _firstName,
       "isAdmin": _isAdmin,
-      "family": _currentUserFamily,
+      "family": userFamily,
     };
 
     String uid = "0";
@@ -101,6 +72,8 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
 
   @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserData>(context);
+    userFamily = userData.family!;
     return Expanded(
       flex: 4,
       child: Form(

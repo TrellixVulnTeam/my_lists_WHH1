@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:my_lists/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_lists/components/user_registration_form.dart';
+import 'package:my_lists/models/models.dart';
+import 'package:provider/provider.dart';
 
 final db = FirebaseFirestore.instance;
 
@@ -17,12 +19,12 @@ class UserRegistrationScreen extends StatefulWidget {
 class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
   @override
   Widget build(BuildContext context) {
-    final arg = ModalRoute.of(context)!.settings.arguments as Map;
-    final String currentFamily = arg['currentUserFamily'];
+    final userData = Provider.of<UserData>(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: Text('My Lists'),
+          backgroundColor: kLightAccentColour,
         ),
         body: Column(
           children: [
@@ -45,19 +47,19 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
                         'Register new user for the',
                         style: TextStyle(fontSize: 25),
                       ),
-                      if (currentFamily.length <= 19)
+                      if (userData.family!.length <= 19)
                         Text(
-                          '$currentFamily family',
+                          '${userData.family} family',
                           style: TextStyle(fontSize: 25),
                         ),
-                      if (currentFamily.length > 19)
+                      if (userData.family!.length > 19)
                         Text(
-                          '$currentFamily',
+                          '${userData.family}',
                           style: TextStyle(fontSize: 25),
                           softWrap: false,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      if (currentFamily.length > 19)
+                      if (userData.family!.length > 19)
                         Text(
                           'family',
                           style: TextStyle(fontSize: 25),
