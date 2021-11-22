@@ -74,86 +74,83 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData>(context);
     userFamily = userData.family!;
-    return Expanded(
-      flex: 4,
-      child: Form(
-        key: _userRegistrationFormKey,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              TextFormField(
-                textAlign: TextAlign.center,
-                decoration: kLoginTextFieldDecoration.copyWith(
-                    hintText: 'Email Address'),
+    return Form(
+      key: _userRegistrationFormKey,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            TextFormField(
+              textAlign: TextAlign.center,
+              decoration:
+                  kLoginTextFieldDecoration.copyWith(hintText: 'Email Address'),
+              onChanged: (value) {
+                _email = value.trim();
+              },
+            ),
+            SizedBox(height: 15.0),
+            TextFormField(
+              obscureText: true,
+              textAlign: TextAlign.center,
+              decoration:
+                  kLoginTextFieldDecoration.copyWith(hintText: 'Password'),
+              onChanged: (value) {
+                _password = value.trim();
+              },
+            ),
+            SizedBox(height: 15.0),
+            TextFormField(
+              textAlign: TextAlign.center,
+              decoration:
+                  kLoginTextFieldDecoration.copyWith(hintText: 'First Name'),
+              onChanged: (value) {
+                _firstName = value.trim();
+              },
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter a first name.';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 8.0),
+            CheckboxListTile(
+                title: Text(
+                  'Admin User',
+                  style: TextStyle(color: kPrimaryTextColour),
+                ),
+                value: _isAdmin,
                 onChanged: (value) {
-                  _email = value.trim();
-                },
-              ),
-              SizedBox(height: 15.0),
-              TextFormField(
-                obscureText: true,
-                textAlign: TextAlign.center,
-                decoration:
-                    kLoginTextFieldDecoration.copyWith(hintText: 'Password'),
-                onChanged: (value) {
-                  _password = value.trim();
-                },
-              ),
-              SizedBox(height: 15.0),
-              TextFormField(
-                textAlign: TextAlign.center,
-                decoration:
-                    kLoginTextFieldDecoration.copyWith(hintText: 'First Name'),
-                onChanged: (value) {
-                  _firstName = value.trim();
-                },
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a first name.';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 8.0),
-              CheckboxListTile(
-                  title: Text(
-                    'Admin User',
-                    style: TextStyle(color: kPrimaryTextColour),
-                  ),
-                  value: _isAdmin,
-                  onChanged: (value) {
+                  setState(() {
+                    _isAdmin = value!;
+                  });
+                }),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                CustomButton(
+                  text: 'Register New User',
+                  colour: kAccentColour,
+                  radius: 32,
+                  onPress: () async {
                     setState(() {
-                      _isAdmin = value!;
+                      showSpinner = true;
                     });
-                  }),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  CustomButton(
-                    text: 'Register New User',
-                    colour: kAccentColour,
-                    radius: 32,
-                    onPress: () async {
-                      setState(() {
-                        showSpinner = true;
-                      });
-                      if (_userRegistrationFormKey.currentState!.validate()) {
-                        createUser();
+                    if (_userRegistrationFormKey.currentState!.validate()) {
+                      createUser();
 
-                        setState(() {
-                          showSpinner = false;
-                        });
-                      }
                       setState(() {
                         showSpinner = false;
                       });
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
+                    }
+                    setState(() {
+                      showSpinner = false;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

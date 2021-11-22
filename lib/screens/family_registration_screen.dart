@@ -7,15 +7,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 final db = FirebaseFirestore.instance;
 
-class FamilyRegistrationScreen extends StatefulWidget {
+class FamilyRegistrationScreen extends StatelessWidget {
   static const String id = 'family_registration_screen';
 
-  @override
-  _FamilyRegistrationScreenState createState() =>
-      _FamilyRegistrationScreenState();
-}
-
-class _FamilyRegistrationScreenState extends State<FamilyRegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(

@@ -28,48 +28,51 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
         ),
         body: Column(
           children: [
-            Expanded(
-              flex: 1,
-              child: Container(
-                alignment: Alignment.topCenter,
-                margin: EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: kPrimaryColour,
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                height: 50,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+            Container(
+              alignment: Alignment.topCenter,
+              margin: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: kAccentColour,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              //height: 150,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    right: 8.0, left: 8.0, top: 10.0, bottom: 10.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'New user for the',
+                      style: TextStyle(fontSize: 30),
+                    ),
+                    if (userData.family!.length <= 23)
                       Text(
-                        'Register new user for the',
-                        style: TextStyle(fontSize: 25),
+                        '${userData.family} family',
+                        style: TextStyle(fontSize: 30),
                       ),
-                      if (userData.family!.length <= 19)
-                        Text(
-                          '${userData.family} family',
-                          style: TextStyle(fontSize: 25),
-                        ),
-                      if (userData.family!.length > 19)
-                        Text(
-                          '${userData.family}',
-                          style: TextStyle(fontSize: 25),
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      if (userData.family!.length > 19)
-                        Text(
-                          'family',
-                          style: TextStyle(fontSize: 25),
-                        ),
-                    ],
-                  ),
+                    if (userData.family!.length > 23)
+                      Text(
+                        '${userData.family}',
+                        style: TextStyle(fontSize: 30),
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    if (userData.family!.length > 23)
+                      Text(
+                        'family',
+                        style: TextStyle(fontSize: 30),
+                      ),
+                  ],
                 ),
               ),
             ),
-            UserRegistrationForm(),
+            SizedBox(height: 10.0),
+            Expanded(
+              child: SingleChildScrollView(
+                child: UserRegistrationForm(),
+              ),
+            ),
           ],
         ),
       ),
