@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/custom_button.dart';
+import 'package:my_lists/screens/edit_users_screen.dart';
 import 'package:my_lists/screens/home_screen.dart';
 
 bool isSuccessful = false;
@@ -51,6 +52,10 @@ class _UserSecurityState extends State<UserSecurity> {
         .catchError((err) => {print(err.toString())});
   }
 
+  Future<void> deleteUserDoc(String userID) async {
+    FirebaseFirestore.instance.collection('users').doc(userID).delete();
+  }
+
   Future<void> resetPassword(String email) async {
     await FirebaseAuth.instance
         .sendPasswordResetEmail(email: email)
@@ -67,7 +72,7 @@ class _UserSecurityState extends State<UserSecurity> {
         builder: (BuildContext context) {
           return AlertDialog(
             elevation: 24.0,
-            title: Text('Delete User'),
+            title: Text('Delete ${widget.userName}'),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
@@ -83,9 +88,9 @@ class _UserSecurityState extends State<UserSecurity> {
                 child: Text('Yes'),
                 onPressed: () {
                   deleteUser();
-                  // double to get rid of the deleted screen too
-                  Navigator.of(context).pop();
-                  Navigator.pop(context);
+                  deleteUserDoc(widget.userID);
+                  Navigator.popUntil(
+                      context, ModalRoute.withName(EditUsers.id));
                 },
               ),
               TextButton(
@@ -146,42 +151,45 @@ class _UserSecurityState extends State<UserSecurity> {
           backgroundColor: kLightAccentColour,
         ),
         body: Container(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 20.0,
-              ),
-              Container(
-                child: Text(
-                  widget.userName,
-                  style: TextStyle(fontSize: 30.0, color: kPrimaryTextColour),
+          child: Center(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 40.0,
                 ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
-                child: CustomButton(
-                  text: 'Send Reset Password Email',
-                  colour: Colors.amberAccent,
-                  radius: 25.0,
-                  onPress: () {
-                    updateConfirm();
-                  },
+                Container(
+                  child: Text(
+                    widget.userName,
+                    style: TextStyle(fontSize: 30.0, color: kPrimaryTextColour),
+                  ),
                 ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
-                child: CustomButton(
-                  text: 'Delete User',
-                  colour: Colors.red,
-                  radius: 25.0,
-                  onPress: () {
-                    deleteConfirm();
-                  },
+                SizedBox(height: 20.0),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+                  child: CustomButton(
+                    text: 'Send Reset Password Email',
+                    colour: kSuperLightAccentColour,
+                    radius: 25.0,
+                    onPress: () {
+                      updateConfirm();
+                    },
+                  ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
+                  child: CustomButton(
+                    text: 'Delete User',
+                    colour: Colors.red,
+                    radius: 25.0,
+                    onPress: () {
+                      deleteConfirm();
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

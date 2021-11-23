@@ -78,18 +78,6 @@ class UserList extends StatefulWidget {
 }
 
 class _UserListState extends State<UserList> {
-  late final String editedUserID;
-  late final String editedUserName;
-  late final String editedUserEmail;
-
-  // @override
-  // void dispose() {
-  //   editedUserEmail = '';
-  //   editedUserID = '';
-  //
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
     CollectionReference userList =
@@ -130,11 +118,7 @@ class _UserListState extends State<UserList> {
                           Icons.edit,
                           color: kPrimaryTextColour,
                         ),
-                        onPressed: () {
-                          editedUserID = document['uid'];
-                          editedUserEmail = document['email'];
-                          editedUserName = document['firstName'];
-                        },
+                        onPressed: () {},
                       ),
                       IconButton(
                         icon: Icon(
@@ -142,16 +126,13 @@ class _UserListState extends State<UserList> {
                           color: kPrimaryTextColour,
                         ),
                         onPressed: () {
-                          editedUserID = document['uid'];
-                          editedUserEmail = document['email'];
-                          editedUserName = document['firstName'];
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => UserSecurity(
-                                        userID: editedUserID,
-                                        userEmail: editedUserEmail,
-                                        userName: editedUserName,
+                                        userID: document['uid'],
+                                        userEmail: document['email'],
+                                        userName: document['firstName'],
                                       )));
                         },
                       ),
