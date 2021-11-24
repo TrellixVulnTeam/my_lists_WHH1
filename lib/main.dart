@@ -9,6 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'models/db_service.dart';
 import 'models/models.dart';
 
+// Navigator Key to allow use of showDialog anywhere
+final navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();

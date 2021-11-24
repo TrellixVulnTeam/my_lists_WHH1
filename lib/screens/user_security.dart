@@ -4,12 +4,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/custom_button.dart';
+import 'package:my_lists/models/models.dart';
 import 'package:my_lists/screens/edit_users_screen.dart';
 import 'package:my_lists/screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:my_lists/main.dart';
 
-bool isSuccessful = false;
+bool deleteDocs = false;
 final db = FirebaseFirestore.instance;
 enum Answers { Yes, No }
+bool deleteSuccessful = false;
 
 class UserSecurity extends StatefulWidget {
   final String userID;
@@ -23,48 +27,70 @@ class UserSecurity extends StatefulWidget {
   _UserSecurityState createState() => _UserSecurityState();
 }
 
+HttpsCallable deleteUserCallable = FirebaseFunctions.instance.httpsCallable(
+    'deleteUserAuth',
+    options: HttpsCallableOptions(timeout: Duration(seconds: 5)));
+
+Future<void> deleteUser(String userID) async {
+  // Create data map to be sent to the function
+  Map<String, dynamic> data = {'uid': userID};
+//TODO: Fix showAlertDialog
+  await deleteUserCallable(data)
+      .then((response) => {
+            if (response.data['status'] == 'success')
+              {
+                deleteSuccessful = true,
+                // showAlertDialog(
+                //     navigatorKey.currentContext, 'User Deleted Successfully'),
+              }
+            else
+              {
+                deleteSuccessful = false,
+                // showAlertDialog(
+                //     navigatorKey.currentContext!, response.data['message']),
+              }
+          })
+      // ignore: return_of_invalid_type_from_catch_error
+      .catchError((err) => {print(err.toString())});
+}
+
 class _UserSecurityState extends State<UserSecurity> {
-  bool deleteSuccessful = false;
-  bool isSuccessful = false;
-
-  HttpsCallable deleteUserCallable = FirebaseFunctions.instance.httpsCallable(
-      'deleteUserAuth',
-      options: HttpsCallableOptions(timeout: Duration(seconds: 5)));
-
-  Future<void> deleteUser() async {
-    // Create data map to be sent to the function
-    Map<String, dynamic> data = {'uid': widget.userID};
-
-    await deleteUserCallable(data)
-        .then((response) => {
-              if (response.data['status'] == 'success')
-                {
-                  deleteSuccessful = true,
-                  showAlertDialog(context, 'User Deleted'),
-                }
-              else
-                {
-                  deleteSuccessful = false,
-                  showAlertDialog(context, response.data['message']),
-                }
-            })
-        // ignore: return_of_invalid_type_from_catch_error
-        .catchError((err) => {print(err.toString())});
-  }
-
   Future<void> deleteUserDoc(String userID) async {
     FirebaseFirestore.instance.collection('users').doc(userID).delete();
   }
 
-  Future<void> resetPassword(String email) async {
-    await FirebaseAuth.instance
-        .sendPasswordResetEmail(email: email)
-        .then((value) => {showAlertDialog(context, 'Email sent')})
-        .catchError((err) => {print(err.toString())});
-  }
-
   @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserData>(context);
+
+    Future<void> resetPassword(String email) async {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: email)
+          .then((value) => {print('email sent')})
+          .catchError((err) => {print(err.toString())});
+    }
+
+    Future<void> deleteUserDocuments(String userID) {
+      return FirebaseFirestore.instance
+          .collection('families')
+          .doc(userData.family)
+          .collection('docs')
+          .where('created_by', isEqualTo: widget.userEmail)
+          .get()
+          .then((value) {
+        value.docs.forEach((document) {
+          FirebaseFirestore.instance
+              .collection('families')
+              .doc(userData.family)
+              .collection('docs')
+              .doc(document.id)
+              .delete()
+              .then((value) => print('Deleted Successfully'))
+              .catchError((error) => print('Error: $error'));
+        });
+      });
+    }
+
     Future<void> deleteConfirm() async {
       return showDialog<void>(
         context: context,
@@ -80,6 +106,21 @@ class _UserSecurityState extends State<UserSecurity> {
                     'Do you wish to delete this user?\nThis cannot be undone.',
                     style: TextStyle(color: kPrimaryTextColour),
                   ),
+                  StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return CheckboxListTile(
+                      title: Text(
+                        'Also delete all of ${widget.userName}\'s documents',
+                        style: TextStyle(color: kPrimaryTextColour),
+                      ),
+                      value: deleteDocs,
+                      onChanged: (value) {
+                        setState(() {
+                          deleteDocs = value!;
+                        });
+                      },
+                    );
+                  }),
                 ],
               ),
             ),
@@ -87,8 +128,9 @@ class _UserSecurityState extends State<UserSecurity> {
               TextButton(
                 child: Text('Yes'),
                 onPressed: () {
-                  deleteUser();
+                  deleteUser(widget.userID);
                   deleteUserDoc(widget.userID);
+                  if (deleteDocs == true) deleteUserDocuments(widget.userID);
                   Navigator.popUntil(
                       context, ModalRoute.withName(EditUsers.id));
                 },
@@ -184,6 +226,7 @@ class _UserSecurityState extends State<UserSecurity> {
                     colour: Colors.red,
                     radius: 25.0,
                     onPress: () {
+                      deleteDocs = false;
                       deleteConfirm();
                     },
                   ),
@@ -202,16 +245,17 @@ showAlertDialog(BuildContext context, String message) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text(isSuccessful == true ? message : 'Unable to Delete User'),
+        title:
+            Text(deleteSuccessful == true ? message : 'Unable to Delete User'),
         content: Text(
           message,
-          style: TextStyle(color: kSecondaryTextColour),
+          style: TextStyle(color: kPrimaryTextColour),
         ),
         actions: [
           TextButton(
             child: Text('OK'),
             onPressed: () async {
-              isSuccessful == true
+              deleteSuccessful == true
                   ? Navigator.popAndPushNamed(context, HomeScreen.id)
                   : Navigator.pop(context);
             },
