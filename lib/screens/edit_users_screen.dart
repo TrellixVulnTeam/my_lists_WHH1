@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/models/models.dart';
+import 'package:my_lists/screens/user_details_screen.dart';
 import 'package:my_lists/screens/user_security.dart';
 import 'package:provider/provider.dart';
 
@@ -80,11 +81,15 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserData>(context);
     CollectionReference userList =
         FirebaseFirestore.instance.collection('users');
 
     return StreamBuilder<QuerySnapshot>(
-      stream: userList.orderBy('firstName').snapshots(),
+      stream: userList
+          .where('family', isEqualTo: userData.family)
+          .orderBy('firstName')
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('No data');
@@ -118,7 +123,16 @@ class _UserListState extends State<UserList> {
                           Icons.edit,
                           color: kPrimaryTextColour,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => UserDetailsScreen(
+                                        userID: document['uid'],
+                                        userEmail: document['email'],
+                                        firstName: document['firstName'],
+                                      )));
+                        },
                       ),
                       IconButton(
                         icon: Icon(
