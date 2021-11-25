@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:my_lists/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:my_lists/screens/edit_users_screen.dart';
+import 'package:my_lists/models/models.dart';
+import 'package:provider/provider.dart';
 import '../components/custom_button.dart';
 import 'package:my_lists/components/user_details_field.dart';
+
+import 'edit_users_screen.dart';
 
 CollectionReference userRef = FirebaseFirestore.instance.collection('users');
 
@@ -27,6 +30,7 @@ class UserDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserData>(context);
     Future<void> updateConfirm() async {
       return showDialog<void>(
         context: context,
@@ -49,9 +53,9 @@ class UserDetailsScreen extends StatelessWidget {
               TextButton(
                 child: Text('Yes'),
                 onPressed: () {
-                  updateUser(userID, userEmail, firstName);
-                  Navigator.of(context).pop();
-                  Navigator.pop(context);
+                  updateUser(userID, userEmail, firstName, userData.family);
+                  Navigator.popUntil(
+                      context, ModalRoute.withName(EditUsers.id));
                 },
               ),
               TextButton(
@@ -128,10 +132,20 @@ class UserDetailsScreen extends StatelessWidget {
   }
 }
 
-void updateUser(String userID, String userEmail, String firstName) {
+void updateUser(
+    String userID, String userEmail, String firstName, String? userFamily) {
   // Create doc to trigger function to change email in Auth
-  Map<String, dynamic> data = {'uid': userID, 'email': userEmail};
-  FirebaseFirestore.instance.collection('users_update_email').doc().set(data);
+  Map<String, dynamic> data = {
+    'uid': userID,
+    'email': userEmail,
+    'firstName': firstName,
+  };
+  FirebaseFirestore.instance
+      .collection('families')
+      .doc(userFamily)
+      .collection('users_update_email')
+      .doc()
+      .set(data);
 
   // Update details in Firestore
   userRef.doc(userID).update({

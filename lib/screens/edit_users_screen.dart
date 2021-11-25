@@ -32,31 +32,33 @@ class EditUsers extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   height: 60,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Users for the',
-                        style: TextStyle(fontSize: 30),
-                      ),
-                      if (userData.family!.length <= 23)
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                         Text(
-                          '${userData.family} family',
+                          'Users for the',
                           style: TextStyle(fontSize: 30),
                         ),
-                      if (userData.family!.length > 23)
-                        Text(
-                          '${userData.family}',
-                          style: TextStyle(fontSize: 30),
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      if (userData.family!.length > 23)
-                        Text(
-                          'family',
-                          style: TextStyle(fontSize: 30),
-                        ),
-                    ],
+                        if (userData.family!.length <= 23)
+                          Text(
+                            '${userData.family} family',
+                            style: TextStyle(fontSize: 30),
+                          ),
+                        if (userData.family!.length > 23)
+                          Text(
+                            '${userData.family}',
+                            style: TextStyle(fontSize: 30),
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        if (userData.family!.length > 23)
+                          Text(
+                            'family',
+                            style: TextStyle(fontSize: 30),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
