@@ -40,14 +40,12 @@ Future<void> deleteUser(String userID) async {
             if (response.data['status'] == 'success')
               {
                 deleteSuccessful = true,
-                // showAlertDialog(
-                //     navigatorKey.currentContext, 'User Deleted Successfully'),
+                showAlertDialog('User Deleted Successfully'),
               }
             else
               {
                 deleteSuccessful = false,
-                // showAlertDialog(
-                //     navigatorKey.currentContext!, response.data['message']),
+                showAlertDialog(response.data['message']),
               }
           })
       // ignore: return_of_invalid_type_from_catch_error
@@ -55,20 +53,9 @@ Future<void> deleteUser(String userID) async {
 }
 
 class _UserSecurityState extends State<UserSecurity> {
-  Future<void> deleteUserDoc(String userID) async {
-    FirebaseFirestore.instance.collection('users').doc(userID).delete();
-  }
-
   @override
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData>(context);
-
-    Future<void> resetPassword(String email) async {
-      await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: email)
-          .then((value) => {print('email sent')})
-          .catchError((err) => {print(err.toString())});
-    }
 
     Future<void> deleteUserDocuments(String userID) {
       return FirebaseFirestore.instance
@@ -91,7 +78,7 @@ class _UserSecurityState extends State<UserSecurity> {
       });
     }
 
-    Future<void> deleteConfirm() async {
+    Future<void> deleteConfirm() {
       return showDialog<void>(
         context: context,
         barrierDismissible: true,
@@ -147,7 +134,7 @@ class _UserSecurityState extends State<UserSecurity> {
       );
     }
 
-    Future<void> updateConfirm() async {
+    Future<void> updateConfirm() {
       return showDialog<void>(
         context: context,
         barrierDismissible: true,
@@ -240,9 +227,21 @@ class _UserSecurityState extends State<UserSecurity> {
   }
 }
 
-showAlertDialog(BuildContext context, String message) {
+Future<void> deleteUserDoc(String userID) async {
+  FirebaseFirestore.instance.collection('users').doc(userID).delete();
+}
+
+Future<void> resetPassword(String email) async {
+  await FirebaseAuth.instance
+      .sendPasswordResetEmail(email: email)
+      .then((value) => {print('email sent')})
+      .catchError((err) => {print(err.toString())});
+}
+
+showAlertDialog(String message) {
+  print(navigatorKey.currentContext);
   showDialog(
-    context: context,
+    context: navigatorKey.currentContext!,
     builder: (BuildContext context) {
       return AlertDialog(
         title:

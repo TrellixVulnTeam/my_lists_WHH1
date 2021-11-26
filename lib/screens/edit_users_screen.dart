@@ -34,8 +34,8 @@ class EditUsers extends StatelessWidget {
                   height: 60,
                   child: SingleChildScrollView(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        SizedBox(height: 20.0),
                         Text(
                           'Users for the',
                           style: TextStyle(fontSize: 30),
