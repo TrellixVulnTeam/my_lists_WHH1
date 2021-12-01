@@ -164,6 +164,28 @@ class _DocsListState extends State<DocsList> {
                                 maxLines: 5,
                                 overflow: TextOverflow.ellipsis,
                               ),
+                            SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                InkWell(
+                                  child: Icon(
+                                    document['isFav'] == true
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: Colors.white,
+                                  ),
+                                  onTap: () {
+                                    bool isFav = document['isFav'];
+                                    isFav = !isFav;
+                                    setState(() {
+                                      toggleFav(
+                                          document.id, isFav, userData.family);
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -210,4 +232,15 @@ void deleteDoc(var docID, String? userFamily) {
       .collection('docs')
       .doc(docID)
       .delete();
+}
+
+void toggleFav(String docID, bool isFav, String? userFamily) {
+  FirebaseFirestore.instance
+      .collection('families')
+      .doc(userFamily)
+      .collection('docs')
+      .doc(docID)
+      .update({'isFav': isFav})
+      .then((value) => print("changed isFav status"))
+      .catchError((error) => print("Failed to update : $error"));
 }

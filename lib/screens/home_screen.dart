@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 icon: Icon(
                   Icons.favorite,
-                  color: Colors.white,
+                  color: kPrimaryTextColour,
                 ),
                 onPressed: () {},
               ),
