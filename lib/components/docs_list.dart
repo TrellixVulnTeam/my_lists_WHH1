@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_lists/constants.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:my_lists/screens/home_screen.dart';
 import 'package:my_lists/screens/list_details_screen.dart';
 import 'package:my_lists/models/item.dart';
 import 'package:my_lists/screens/note_details_screen.dart';
@@ -44,12 +45,24 @@ class _DocsListState extends State<DocsList> {
         .snapshots();
   }
 
+  Stream<QuerySnapshot> familyFavDocsStream(String? userFamily) async* {
+    yield* db
+        .collection('families')
+        .doc(userFamily)
+        .collection('docs')
+        .where('isFav', isEqualTo: true)
+        .orderBy('created_at', descending: true)
+        .snapshots();
+  }
+
   @override
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData>(context);
 
     return StreamBuilder<QuerySnapshot>(
-        stream: familyDocsStream(userData.family),
+        stream: onlyFav == false
+            ? familyDocsStream(userData.family)
+            : familyFavDocsStream(userData.family),
         builder: (homeScreenState, snapshot) {
           if (!snapshot.hasData) {
             return Text('No data');
@@ -241,6 +254,6 @@ void toggleFav(String docID, bool isFav, String? userFamily) {
       .collection('docs')
       .doc(docID)
       .update({'isFav': isFav})
-      .then((value) => print("changed isFav status"))
+      .then((value) => print("changed isFav status to $isFav"))
       .catchError((error) => print("Failed to update : $error"));
 }

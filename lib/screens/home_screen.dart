@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_lists/components/center_text.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/new_list.dart';
 import 'package:my_lists/screens/edit_users_screen.dart';
@@ -16,6 +17,7 @@ final db = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
 final authUser = FirebaseAuth.instance.currentUser;
 String docType = 'list';
+bool onlyFav = false;
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
@@ -55,63 +57,84 @@ class _HomeScreenState extends State<HomeScreen> {
           color: kSuperLightAccentColour,
           shape: CircularNotchedRectangle(),
           notchMargin: 5,
-          child: Row(
-            //children inside bottom appbar
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.favorite,
-                  color: kPrimaryTextColour,
-                ),
-                onPressed: () {},
-              ),
-              Padding(
-                padding: EdgeInsets.only(right: 90),
-                child: PopupMenuButton(
-                  icon: Icon(
-                    Icons.people,
-                    color: kPrimaryTextColour,
-                  ),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      child: Text('User Settings'),
-                      value: 1,
-                    ),
-                    if (userData.isAdmin == true)
-                      PopupMenuItem(
-                        child: Text('Register New User'),
-                        value: 2,
-                      ),
-                    if (userData.isAdmin == true)
-                      PopupMenuItem(
-                        child: Text('Edit Users'),
-                        value: 3,
-                      ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (onlyFav == true)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    (Text(
+                      'Favourites only',
+                      style: TextStyle(fontSize: 20.0, color: kAccentColour),
+                    )),
                   ],
-                  onSelected: (value) {
-                    switch (value) {
-                      case 1:
-                        print('You chose settings');
-                        break;
-                      case 2:
-                        Navigator.pushNamed(context, UserRegistrationScreen.id);
-                        break;
-                      case 3:
-                        Navigator.pushNamed(context, EditUsers.id);
-                        break;
-                    }
-                  },
                 ),
-              )
+              Row(
+                //children inside bottom appbar
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(
+                      Icons.search,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.favorite,
+                      color:
+                          onlyFav == true ? kAccentColour : kPrimaryTextColour,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        onlyFav = !onlyFav;
+                      });
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(right: 90),
+                    child: PopupMenuButton(
+                      icon: Icon(
+                        Icons.people,
+                        color: kPrimaryTextColour,
+                      ),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          child: Text('User Settings'),
+                          value: 1,
+                        ),
+                        if (userData.isAdmin == true)
+                          PopupMenuItem(
+                            child: Text('Register New User'),
+                            value: 2,
+                          ),
+                        if (userData.isAdmin == true)
+                          PopupMenuItem(
+                            child: Text('Edit Users'),
+                            value: 3,
+                          ),
+                      ],
+                      onSelected: (value) {
+                        switch (value) {
+                          case 1:
+                            print('You chose settings');
+                            break;
+                          case 2:
+                            Navigator.pushNamed(
+                                context, UserRegistrationScreen.id);
+                            break;
+                          case 3:
+                            Navigator.pushNamed(context, EditUsers.id);
+                            break;
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
             ],
           ),
         ),
