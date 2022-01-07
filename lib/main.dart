@@ -8,9 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'models/db_service.dart';
 import 'models/models.dart';
-
-// Navigator Key to allow use of showDialog anywhere
-final navigatorKey = GlobalKey<NavigatorState>();
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +29,6 @@ class App extends StatelessWidget {
   }
 }
 
-//The MaterialApp Wrapped so that it not has to be rewritten
 class MyApp extends StatelessWidget {
   final Widget child;
 
@@ -44,6 +41,8 @@ class MyApp extends StatelessWidget {
       theme: appTheme(),
       routes: routes,
       home: child,
+      navigatorObservers: [FlutterSmartDialog.observer],
+      builder: FlutterSmartDialog.init(),
     );
   }
 }
@@ -90,6 +89,7 @@ class AuthorizedProviderLayer extends StatelessWidget {
   }
 }
 
+// TODO: delete all checked in list doc
 // TODO: bottom menu
 // TODO: User settings (change color, etc..)
 // TODO: work out data encryption for DB

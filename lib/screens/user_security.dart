@@ -7,7 +7,7 @@ import 'package:my_lists/components/custom_button.dart';
 import 'package:my_lists/models/models.dart';
 import 'package:my_lists/screens/edit_users_screen.dart';
 import 'package:provider/provider.dart';
-//import 'package:my_lists/main.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 bool deleteDocs = false;
 final db = FirebaseFirestore.instance;
@@ -58,6 +58,8 @@ class _UserSecurityState extends State<UserSecurity> {
         barrierDismissible: true,
         builder: (BuildContext context) {
           return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             elevation: 24.0,
             title: Text('Delete ${widget.userName}'),
             content: SingleChildScrollView(
@@ -114,6 +116,8 @@ class _UserSecurityState extends State<UserSecurity> {
         barrierDismissible: true,
         builder: (BuildContext context) {
           return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             elevation: 24.0,
             title: Text('Password Reset'),
             content: SingleChildScrollView(
@@ -208,24 +212,37 @@ HttpsCallable deleteUserCallable = FirebaseFunctions.instance.httpsCallable(
 Future<void> deleteUser(String userID) async {
   // Create data map to be sent to the function
   Map<String, dynamic> data = {'uid': userID};
-//TODO: Fix showAlertDialog
-  await deleteUserCallable(data)
-      .then((response) => {
-            if (response.data['status'] == 'success')
-              {
-                deleteSuccessful = true,
-                // showAlertDialog(
-                //     navigatorKey.currentContext!, 'User Deleted Successfully'),
-              }
-            else
-              {
-                deleteSuccessful = false,
-                // showAlertDialog(
-                //     navigatorKey.currentContext!, response.data['message']),
-              }
-          })
-      // ignore: return_of_invalid_type_from_catch_error
-      .catchError((err) => {print(err.toString())});
+  await deleteUserCallable(data).then((response) => {
+        if (response.data['status'] == 'success')
+          {
+            deleteSuccessful = true,
+            _show('User Deleted'),
+          }
+        else
+          {
+            deleteSuccessful = false,
+            _show('Unable to delete user'),
+          }
+      });
+}
+
+void _show(String message) {
+  SmartDialog.show(
+    isLoadingTemp: false,
+    widget: Container(
+      height: 80,
+      width: 180,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        message,
+        style: TextStyle(color: kPrimaryTextColour, fontSize: 25.0),
+      ),
+    ),
+  );
 }
 
 Future<void> deleteUserDoc(String userID) async {
@@ -241,26 +258,25 @@ Future<void> resetPassword(String email) async {
 
 // showAlertDialog(BuildContext context, String message) {
 //   showDialog(
-//     context: context,
-//     builder: (BuildContext context) {
-//       return AlertDialog(
-//         title:
-//             Text(deleteSuccessful == true ? message : 'Unable to Delete User'),
-//         content: Text(
-//           message,
-//           style: TextStyle(color: kPrimaryTextColour),
-//         ),
-//         actions: [
-//           TextButton(
-//             child: Text('OK'),
-//             onPressed: () async {
-//               deleteSuccessful == true
-//                   ? Navigator.popAndPushNamed(context, HomeScreen.id)
-//                   : Navigator.pop(context);
-//             },
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: Text(
+//               deleteSuccessful == true ? message : 'Unable to Delete User'),
+//           content: Text(
+//             message,
+//             style: TextStyle(color: kPrimaryTextColour),
 //           ),
-//         ],
-//       );
-//     },
-//   );
+//           actions: [
+//             TextButton(
+//               child: Text('OK'),
+//               onPressed: () async {
+//                 deleteSuccessful == true
+//                     ? Navigator.popAndPushNamed(context, HomeScreen.id)
+//                     : Navigator.pop(context);
+//               },
+//             ),
+//           ],
+//         );
+//       });
 // }

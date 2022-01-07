@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:my_lists/components/center_text.dart';
 import 'package:my_lists/constants.dart';
 import 'package:my_lists/components/new_list.dart';
 import 'package:my_lists/screens/edit_users_screen.dart';
@@ -75,13 +74,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.search,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {},
-                  ),
+                  PopupMenuButton(
+                      icon: Icon(
+                        Icons.more_horiz,
+                        color: kPrimaryTextColour,
+                      ),
+                      itemBuilder: (context) => [
+                            PopupMenuItem(
+                              child: Text('Delete all checked'),
+                            ),
+                          ]),
                   IconButton(
                     icon: Icon(
                       Icons.favorite,

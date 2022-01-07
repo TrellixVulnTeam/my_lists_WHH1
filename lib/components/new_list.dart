@@ -220,6 +220,7 @@ void createList(title) {
           'type': 'list',
           'isPrivate': isPrivate,
           'id': tempNewDoc.id,
+          'isFav': false,
         })
         .then((value) => print("List Added with title: $title"))
         .catchError((error) => print("Failed to add list: $error"));

@@ -97,9 +97,27 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                 List listOfItems = snapshot.data['body'].entries
                     .map((e) => SingleItem(name: e.key, isDone: e.value))
                     .toList();
+                // sort alphabetically
+                listOfItems.sort((a, b) => a.name.compareTo(b.name));
                 return Column(
                   children: [
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          InkWell(
+                            child: Icon(
+                              Icons.check,
+                              color: kAccentColour,
+                              size: 35.0,
+                            ),
+                            onTap: () {},
+                          ),
+                        ],
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(top: 15.0),
                       child: Text(
@@ -197,7 +215,8 @@ void toggleDone(
       .collection('docs')
       .doc(listID)
       .update({'body.$itemName': isDone})
-      .then((value) => print("data updated for item $itemName in list $listID"))
+      .then(
+          (value) => print("data updated for item '$itemName' in list $listID"))
       .catchError((error) => print("Failed to update : $error"));
 }
 

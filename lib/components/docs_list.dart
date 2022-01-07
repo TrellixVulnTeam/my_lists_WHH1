@@ -92,6 +92,7 @@ class _DocsListState extends State<DocsList> {
                       .entries
                       .map((e) => SingleItem(name: e.key, isDone: e.value))
                       .toList();
+                  listBody.sort((a, b) => a.name.compareTo(b.name));
                   // If doc is a note then just display
                 } else if (document['type'] == 'note') {
                   docText = document['body'];

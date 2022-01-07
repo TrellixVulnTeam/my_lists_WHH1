@@ -147,6 +147,7 @@ class _NewTextState extends State<NewText> {
             'type': 'note',
             'isPrivate': isPrivate,
             'id': tempNewDoc.id,
+            'isFav': false,
           })
           .then((value) => print("Note Added with title: $title"))
           .catchError((error) => print("Failed to add note: $error"));
