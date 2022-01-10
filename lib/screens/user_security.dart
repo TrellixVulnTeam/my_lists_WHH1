@@ -7,7 +7,7 @@ import 'package:my_lists/components/custom_button.dart';
 import 'package:my_lists/models/models.dart';
 import 'package:my_lists/screens/edit_users_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:my_lists/components/dialog.dart';
 
 bool deleteDocs = false;
 final db = FirebaseFirestore.instance;
@@ -216,33 +216,14 @@ Future<void> deleteUser(String userID) async {
         if (response.data['status'] == 'success')
           {
             deleteSuccessful = true,
-            _show('User Deleted'),
+            showCustomDialog('User Deleted'),
           }
         else
           {
             deleteSuccessful = false,
-            _show('Unable to delete user'),
+            showCustomDialog('Unable to delete user'),
           }
       });
-}
-
-void _show(String message) {
-  SmartDialog.show(
-    isLoadingTemp: false,
-    widget: Container(
-      height: 80,
-      width: 180,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        message,
-        style: TextStyle(color: kPrimaryTextColour, fontSize: 25.0),
-      ),
-    ),
-  );
 }
 
 Future<void> deleteUserDoc(String userID) async {

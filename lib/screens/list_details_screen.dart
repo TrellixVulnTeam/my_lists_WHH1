@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_lists/models/item.dart';
 import 'package:provider/provider.dart';
 import 'package:my_lists/models/models.dart';
+import 'package:my_lists/components/dialog.dart';
 
 final db = FirebaseFirestore.instance;
 late String itemName;
@@ -113,7 +114,10 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                               color: kAccentColour,
                               size: 35.0,
                             ),
-                            onTap: () {},
+                            onTap: () {
+                              deleteChecked(
+                                  listOfItems, listID, userData.family);
+                            },
                           ),
                         ],
                       ),
@@ -236,4 +240,12 @@ void addItem(String itemName, String listID, String? userFamily) {
       .collection('docs')
       .doc(listID)
       .update({'body.$itemName': false});
+}
+
+void deleteChecked(List list, String listID, String? userFamily) {
+  for (int index = 0; index < list.length; index++) {
+    if (list[index].isDone == true) {
+      deleteItem(list[index].name, listID, userFamily);
+    }
+  }
 }
