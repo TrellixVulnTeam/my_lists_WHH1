@@ -89,7 +89,6 @@ class AuthorizedProviderLayer extends StatelessWidget {
   }
 }
 
-// TODO: delete all checked in list doc
 // TODO: bottom menu
 // TODO: User settings (change color, etc..)
 // TODO: work out data encryption for DB

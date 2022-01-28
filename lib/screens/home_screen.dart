@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       itemBuilder: (context) => [
                             PopupMenuItem(
-                              child: Text('Delete all checked'),
+                              child: Text('Put some option here'),
                             ),
                           ]),
                   IconButton(

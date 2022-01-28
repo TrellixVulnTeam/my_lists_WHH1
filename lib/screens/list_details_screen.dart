@@ -8,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_lists/models/item.dart';
 import 'package:provider/provider.dart';
 import 'package:my_lists/models/models.dart';
-import 'package:my_lists/components/dialog.dart';
 
 final db = FirebaseFirestore.instance;
 late String itemName;
@@ -115,8 +114,43 @@ class _ListDetailsScreenState extends State<ListDetailsScreen> {
                               size: 35.0,
                             ),
                             onTap: () {
-                              deleteChecked(
-                                  listOfItems, listID, userData.family);
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                        title:
+                                            Text('Delete all checked items?'),
+                                        backgroundColor:
+                                            kSuperLightAccentColour,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(32.0)),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () {
+                                                deleteChecked(listOfItems,
+                                                    listID, userData.family);
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                'OK',
+                                                style: TextStyle(
+                                                    fontSize: 20.0,
+                                                    color: kPrimaryTextColour),
+                                              )),
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                'Cancel',
+                                                style: TextStyle(
+                                                    fontSize: 20.0,
+                                                    color: kPrimaryTextColour),
+                                              ))
+                                        ]);
+                                  });
                             },
                           ),
                         ],
