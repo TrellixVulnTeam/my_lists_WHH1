@@ -82,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           try {
                             final user = await _auth.signInWithEmailAndPassword(
                                 email: email, password: password);
+                            // ignore: unnecessary_null_comparison
                             if (user != null) {
                               Navigator.pushNamed(
                                 context,
